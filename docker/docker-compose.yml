@@ -9,7 +9,7 @@ services:
         USER_ID: '${WWWUSER:-1000}'
         GROUP_ID: '${WWWGROUP:-1000}'
         USER: '${USER:-whoami}'
-    container_name: expennies-app
+    container_name: exp-app
     restart: always
     working_dir: /var/www/
     extra_hosts:
@@ -18,7 +18,7 @@ services:
       - ../:/var/www
   nginx:
     image: nginx:1.19-alpine
-    container_name: expennies-nginx
+    container_name: exp-nginx
     restart: always
     ports:
       - "8000:80"
@@ -26,7 +26,7 @@ services:
       - ../:/var/www
       - ./nginx:/etc/nginx/conf.d
   db:
-    container_name: expennies-db
+    container_name: exp-db
     image: mysql:8.0
     volumes:
       - ./storage/mysql:/var/lib/mysql
@@ -34,4 +34,4 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - "3306:3306"
+      - "3307:3306"
