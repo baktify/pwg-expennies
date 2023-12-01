@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-use App\Enum\AppEnvironment;
+use App\Enums\AppEnvironment;
 
 $appEnv = $_ENV['APP_ENV'] ?? AppEnvironment::Production->value;
 
@@ -16,7 +16,7 @@ return [
     'doctrine'              => [
         'dev_mode'   => AppEnvironment::isDevelopment($appEnv),
         'cache_dir'  => STORAGE_PATH . '/cache/doctrine',
-        'entity_dir' => [APP_PATH . '/Entity'],
+        'entity_dir' => [APP_PATH . '/Entities'],
         'connection' => [
             'driver'   => $_ENV['DB_DRIVER'] ?? 'pdo_mysql',
             'host'     => $_ENV['DB_HOST'] ?? 'localhost',
