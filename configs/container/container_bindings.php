@@ -8,6 +8,9 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Slim\App;
+use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Component\Asset\Package;
@@ -19,6 +22,19 @@ use Symfony\WebpackEncoreBundle\Twig\EntryFilesTwigExtension;
 use Twig\Extra\Intl\IntlExtension;
 
 return [
+    App::class => function (ContainerInterface $container) {
+        $addMiddlewares = require CONFIG_PATH . '/middleware.php';
+        $router = require CONFIG_PATH . '/routes/web.php';
+
+        AppFactory::setContainer($container);
+        $app = AppFactory::create();
+
+        $addMiddlewares($app);
+        $router($app);
+
+        return $app;
+    },
+
     Config::class => new Config(require CONFIG_PATH . '/app.php'),
 
     EntityManager::class => function (Config $config) {
@@ -41,9 +57,6 @@ return [
         return $twig;
     },
 
-    /**
-     * The following two bindings are needed for EntryFilesTwigExtension & AssetExtension to work for Twig
-     */
     'webpack_encore.packages' => fn() => new Packages(
         new Package(new JsonManifestVersionStrategy(BUILD_PATH . '/manifest.json'))
     ),
@@ -52,4 +65,6 @@ return [
         new EntrypointLookup(BUILD_PATH . '/entrypoints.json'),
         $container->get('webpack_encore.packages')
     ),
+
+    ResponseFactoryInterface::class => fn(App $app) => $app->getResponseFactory(),
 ];
