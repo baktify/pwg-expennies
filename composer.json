@@ -18,7 +18,6 @@
         "doctrine/dbal": "^3.4",
         "doctrine/migrations": "^3.5",
         "doctrine/orm": "^2.13",
-        "filp/whoops": "^2.15",
         "php-di/php-di": "^6.4",
         "slim/psr7": "^1.5",
         "slim/slim": "^4.10",
@@ -30,7 +29,8 @@
         "twig/intl-extra": "^3.4",
         "twig/twig": "^3.4",
         "vlucas/phpdotenv": "^5.4",
-        "vlucas/valitron": "^1.4"
+        "vlucas/valitron": "^1.4",
+        "zeuxisoo/slim-whoops": "^0.7.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"

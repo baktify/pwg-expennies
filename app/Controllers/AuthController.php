@@ -28,7 +28,6 @@ class AuthController
 
     public function logIn()
     {
-
     }
 
     public function register(Request $request, Response $response): Response
