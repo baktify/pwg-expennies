@@ -6,7 +6,7 @@ use App\Config;
 use App\Middlewares\StartSessionMiddleware;
 use App\Middlewares\RegisterTwigValidationErrorsMiddleware;
 use App\Middlewares\RegisterTwigValidationOldValuesMiddleware;
-use App\Middlewares\HandleValidationExceptionMiddleware;
+use App\Middlewares\ValidationExceptionMiddleware;
 use Slim\App;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
@@ -16,7 +16,7 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 return function (App $app) {
     $container = $app->getContainer();
 
-    $app->add(HandleValidationExceptionMiddleware::class);
+    $app->add(ValidationExceptionMiddleware::class);
 
     $app->add(RegisterTwigValidationErrorsMiddleware::class);
 
