@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use App\Config;
+use App\Middlewares\AuthenticateMiddleware;
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\StartSessionMiddleware;
 use App\Middlewares\TwigValidationErrorsMiddleware;
@@ -16,6 +17,8 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
 return function (App $app) {
     $container = $app->getContainer();
+
+    $app->add(AuthenticateMiddleware::class);
 
     $app->add(ValidationExceptionMiddleware::class);
 

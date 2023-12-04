@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use App\Contracts\UserInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Mapping\Column;
@@ -14,7 +15,7 @@ use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\Table;
 
 #[Entity, Table('users'), HasLifecycleCallbacks]
-class User
+class User implements UserInterface
 {
     #[Id, GeneratedValue, Column(options: ['unsigned' => true])]
     private int $id;
