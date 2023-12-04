@@ -18,7 +18,7 @@ class UserProviderService implements UserProviderServiceInterface
         return $this->em->find(User::class, $id);
     }
 
-    public function findOneBy(array $credentials): ?UserInterface
+    public function getByCredentials(array $credentials): ?UserInterface
     {
         return $this->em->getRepository(User::class)->findOneBy(['email' => $credentials['email']]);
     }

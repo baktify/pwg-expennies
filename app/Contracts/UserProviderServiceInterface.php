@@ -6,5 +6,5 @@ interface UserProviderServiceInterface
 {
     public function find(int $id): ?UserInterface;
 
-    public function findOneBy(array $credentials): ?UserInterface;
+    public function getByCredentials(array $credentials): ?UserInterface;
 }

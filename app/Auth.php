@@ -16,6 +16,10 @@ class Auth implements AuthInterface
 
     public function user(): ?UserInterface
     {
+        if ($this->user !== null) {
+            return $this->user;
+        }
+
         $userId = $_SESSION['user'] ?? null;
 
         if ($userId === null) {
@@ -33,9 +37,9 @@ class Auth implements AuthInterface
 
     public function attempt(array $credentials): bool
     {
-        $user = $this->userService->findOneBy($credentials);
+        $user = $this->userService->getByCredentials($credentials);
 
-        if (!$user || !password_verify($credentials['password'], $user->getPassword())) {
+        if (!$user || !$this->checkCredentials($user, $credentials)) {
             return false;
         }
 
@@ -46,6 +50,11 @@ class Auth implements AuthInterface
         $_SESSION['user'] = $user->getId();
 
         return true;
+    }
+
+    public function checkCredentials(UserInterface $user, array $credentials): bool
+    {
+        return password_verify($credentials['password'], $user->getPassword());
     }
 
     public function logOut(): void
