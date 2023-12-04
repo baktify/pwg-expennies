@@ -20,6 +20,7 @@ class StartSessionMiddleware implements MiddlewareInterface
             throw new SessionException('Can not start sessions, headers are already sent');
         }
 
+        session_set_cookie_params(['HttpOnly' => true, 'SameSite' => 'Lax']);
         session_start();
 
         $response = $handler->handle($request);

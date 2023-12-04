@@ -3,9 +3,10 @@
 declare(strict_types = 1);
 
 use App\Config;
+use App\Middlewares\AuthMiddleware;
 use App\Middlewares\StartSessionMiddleware;
-use App\Middlewares\RegisterTwigValidationErrorsMiddleware;
-use App\Middlewares\RegisterTwigValidationOldValuesMiddleware;
+use App\Middlewares\TwigValidationErrorsMiddleware;
+use App\Middlewares\TwigValidationOldValuesMiddleware;
 use App\Middlewares\ValidationExceptionMiddleware;
 use Slim\App;
 use Slim\Views\Twig;
@@ -18,9 +19,9 @@ return function (App $app) {
 
     $app->add(ValidationExceptionMiddleware::class);
 
-    $app->add(RegisterTwigValidationErrorsMiddleware::class);
+    $app->add(TwigValidationErrorsMiddleware::class);
 
-    $app->add(RegisterTwigValidationOldValuesMiddleware::class);
+    $app->add(TwigValidationOldValuesMiddleware::class);
 
     $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 

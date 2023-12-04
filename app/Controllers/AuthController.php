@@ -26,8 +26,27 @@ class AuthController
         return $this->twig->render($response, 'auth/register.twig');
     }
 
-    public function logIn()
+    public function logIn(Request $request, Response $response): Response
     {
+        $data = $request->getParsedBody();
+
+        $v = new Validator($data);
+        $v->rule('required', ['email', 'password']);
+        $v->rule('email', 'email');
+
+        $user = $this->em->getRepository(User::class)->findOneBy(['email' => $data['email']]);
+
+        if (!$user || !password_verify($data['password'], $user->getPassword())) {
+            throw new ValidationException(['password' => ['You have entered a wrong email or password']]);
+        }
+
+        session_regenerate_id();
+
+        $_SESSION['user'] = $user->getId();
+
+        return $response
+            ->withHeader('Location', '/')
+            ->withStatus(302);
     }
 
     public function register(Request $request, Response $response): Response
@@ -44,7 +63,7 @@ class AuthController
             return !$this->em->getRepository(User::class)->count(['email' => $value]);
         }, 'email')->message('Entered email address already exists');
 
-        if($v->validate()) {
+        if ($v->validate()) {
             echo "Yay! We're all good!";
         } else {
             throw new ValidationException($v->errors());

@@ -8,7 +8,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Views\Twig;
 
-class RegisterTwigValidationOldValuesMiddleware implements MiddlewareInterface
+class TwigValidationErrorsMiddleware implements MiddlewareInterface
 {
     public function __construct(private readonly Twig $twig)
     {
@@ -16,11 +16,11 @@ class RegisterTwigValidationOldValuesMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $_SESSION['old'] ??= [];
+        $_SESSION['errors'] ??= [];
 
-        $this->twig->getEnvironment()->addGlobal('old', $_SESSION['old']);
+        $this->twig->getEnvironment()->addGlobal('errors', $_SESSION['errors']);
 
-        unset($_SESSION['old']);
+        unset($_SESSION['errors']);
 
         return $handler->handle($request);
     }
