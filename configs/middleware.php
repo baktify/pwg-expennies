@@ -3,10 +3,10 @@
 declare(strict_types = 1);
 
 use App\Config;
-use App\Middlewares\SessionStartMiddleware;
-use App\Middlewares\TwigValidationRegisterErrorsMiddleware;
-use App\Middlewares\TwigValidationRegisterOldValuesMiddleware;
-use App\Middlewares\ValidationExceptionHandlerMiddleware;
+use App\Middlewares\StartSessionMiddleware;
+use App\Middlewares\RegisterTwigValidationErrorsMiddleware;
+use App\Middlewares\RegisterTwigValidationOldValuesMiddleware;
+use App\Middlewares\HandleValidationExceptionMiddleware;
 use Slim\App;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
@@ -16,15 +16,15 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 return function (App $app) {
     $container = $app->getContainer();
 
-    $app->add(ValidationExceptionHandlerMiddleware::class);
+    $app->add(HandleValidationExceptionMiddleware::class);
 
-    $app->add(TwigValidationRegisterErrorsMiddleware::class);
+    $app->add(RegisterTwigValidationErrorsMiddleware::class);
 
-    $app->add(TwigValidationRegisterOldValuesMiddleware::class);
+    $app->add(RegisterTwigValidationOldValuesMiddleware::class);
 
     $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 
-    $app->add(SessionStartMiddleware::class);
+    $app->add(StartSessionMiddleware::class);
 
     $app->add(new Zeuxisoo\Whoops\Slim\WhoopsMiddleware());
 };

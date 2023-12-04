@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class ValidationExceptionHandlerMiddleware implements MiddlewareInterface
+class HandleValidationExceptionMiddleware implements MiddlewareInterface
 {
     public function __construct(private readonly ResponseFactoryInterface $responseFactory)
     {
