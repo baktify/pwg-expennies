@@ -5,9 +5,13 @@ declare(strict_types=1);
 use App\Auth;
 use App\Config;
 use App\Contracts\AuthInterface;
+use App\Contracts\SessionInterface;
 use App\Contracts\UserProviderServiceInterface;
+use App\DataObjects\SessionConfig;
 use App\Enums\AppEnvironment;
+use App\Enums\SameSite;
 use App\Services\UserProviderService;
+use App\Session;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
@@ -73,4 +77,12 @@ return [
     ResponseFactoryInterface::class => fn(App $app) => $app->getResponseFactory(),
     AuthInterface::class => fn(ContainerInterface $container) => $container->get(Auth::class),
     UserProviderServiceInterface::class => fn(ContainerInterface $container) => $container->get(UserProviderService::class),
+    SessionInterface::class => function (Config $config) {
+        return new Session(new SessionConfig(
+            $config->get('session.name', 'Expennies'),
+            $config->get('session.secure', true),
+            $config->get('session.httponly', true),
+            $config->get('session.samesite', SameSite::Lax),
+        ));
+    },
 ];

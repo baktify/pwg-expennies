@@ -3,8 +3,10 @@
 declare(strict_types = 1);
 
 use App\Enums\AppEnvironment;
+use App\Enums\SameSite;
 
 $appEnv = $_ENV['APP_ENV'] ?? AppEnvironment::Production->value;
+$appSnakeName = strtolower(str_replace(' ', '_', $_ENV['APP_NAME']));
 
 return [
     'app_name'              => $_ENV['APP_NAME'],
@@ -26,4 +28,10 @@ return [
             'password' => $_ENV['DB_PASS'],
         ],
     ],
+    'session' => [
+        'name' => $appSnakeName . '_session',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => SameSite::Lax,
+    ]
 ];
