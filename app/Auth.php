@@ -10,7 +10,7 @@ class Auth implements AuthInterface
 {
     private ?UserInterface $user;
 
-    public function __construct(private readonly UserProviderServiceInterface $userService)
+    public function __construct(private readonly UserProviderServiceInterface $userProviderService)
     {
     }
 
@@ -26,7 +26,7 @@ class Auth implements AuthInterface
             return null;
         }
 
-        $user = $this->userService->find($userId);
+        $user = $this->userProviderService->find($userId);
 
         if ($user === null) {
             return null;
@@ -37,7 +37,7 @@ class Auth implements AuthInterface
 
     public function attempt(array $credentials): bool
     {
-        $user = $this->userService->getByCredentials($credentials);
+        $user = $this->userProviderService->getByCredentials($credentials);
 
         if (!$user || !$this->checkCredentials($user, $credentials)) {
             return false;
