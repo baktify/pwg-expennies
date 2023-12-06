@@ -13,13 +13,13 @@ use Slim\Views\TwigMiddleware;
 return function (App $app) {
     $container = $app->getContainer();
 
+    $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
+
     $app->add(ValidationExceptionMiddleware::class);
 
     $app->add(TwigValidationErrorsMiddleware::class);
 
     $app->add(TwigValidationOldValuesMiddleware::class);
-
-    $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 
     $app->add(SessionStartMiddleware::class);
 

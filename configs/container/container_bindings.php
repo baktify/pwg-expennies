@@ -79,7 +79,8 @@ return [
     UserProviderServiceInterface::class => fn(ContainerInterface $container) => $container->get(UserProviderService::class),
     SessionInterface::class => function (Config $config) {
         return new Session(new SessionConfig(
-            $config->get('session.name', 'Expennies'),
+            $config->get('session.name', 'expennies'),
+            $config->get('session.flashName', 'flash'),
             $config->get('session.secure', true),
             $config->get('session.httponly', true),
             $config->get('session.samesite', SameSite::Lax),
