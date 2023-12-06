@@ -4,8 +4,12 @@ namespace App\Controllers;
 
 use App\Auth;
 use App\Contracts\AuthInterface;
+use App\Contracts\RequestValidatorFactoryInterface;
+use App\DataObjects\UserRegisterData;
 use App\Entities\User;
 use App\Exceptions\ValidationException;
+use App\RequestValidators\UserLogInRequestValidator;
+use App\RequestValidators\UserRegisterRequestValidator;
 use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -15,9 +19,9 @@ use Valitron\Validator;
 class AuthController
 {
     public function __construct(
-        private readonly Twig $twig,
-        private readonly EntityManager $em,
-        private readonly AuthInterface $auth
+        private readonly Twig                             $twig,
+        private readonly AuthInterface                    $auth,
+        private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
     )
     {
     }
@@ -34,11 +38,7 @@ class AuthController
 
     public function logIn(Request $request, Response $response): Response
     {
-        $data = $request->getParsedBody();
-
-        $v = new Validator($data);
-        $v->rule('required', ['email', 'password']);
-        $v->rule('email', 'email');
+        $data = $this->requestValidatorFactory->make(UserLogInRequestValidator::class)->validate($request->getParsedBody());
 
         if (!$this->auth->attempt($data)) {
             throw new ValidationException(['password' => ['You have entered a wrong email or password']]);
@@ -51,33 +51,13 @@ class AuthController
 
     public function register(Request $request, Response $response): Response
     {
-        $data = $request->getParsedBody();
+        $data = $this->requestValidatorFactory->make(UserRegisterRequestValidator::class)->validate($request->getParsedBody());
 
-        $v = new Validator($data);
-        $v->rule('required', ['name', 'email', 'password']);
-        $v->rule('required', 'confirmPassword')->label('Confirm Password');
-        $v->rule('email', 'email');
-        $v->rule('equals', 'confirmPassword', 'password');
+        $this->auth->register(new UserRegisterData(
+            $data['name'], $data['email'], $data['password']
+        ));
 
-        $v->rule(function ($field, $value, $params, $fields) {
-            return !$this->em->getRepository(User::class)->count(['email' => $value]);
-        }, 'email')->message('Entered email address already exists');
-
-        if ($v->validate()) {
-            echo "Yay! We're all good!";
-        } else {
-            throw new ValidationException($v->errors());
-        }
-
-        $user = new User();
-        $user->setEmail($data['email']);
-        $user->setName($data['name']);
-        $user->setPassword(password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]));
-
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return $response;
+        return $response->withHeader('Location', '/')->withStatus(302);
     }
 
     public function logOut(Request $request, Response $response): Response

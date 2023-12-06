@@ -6,6 +6,7 @@ use App\Contracts\AuthInterface;
 use App\Contracts\SessionInterface;
 use App\Contracts\UserInterface;
 use App\Contracts\UserProviderServiceInterface;
+use App\DataObjects\UserRegisterData;
 
 class Auth implements AuthInterface
 {
@@ -45,13 +46,9 @@ class Auth implements AuthInterface
             return false;
         }
 
-        $this->user = $user;
-
-        if (! $this->session->regenerate()) {
+        if (!$this->authenticate($user)) {
             return false;
-        };
-
-        $this->session->put('user', $user->getId());
+        }
 
         return true;
     }
@@ -66,5 +63,25 @@ class Auth implements AuthInterface
         $this->session->forget('user');
 
         $this->user = null;
+    }
+
+    public function register(UserRegisterData $data): void
+    {
+        $user = $this->userProviderService->createUser($data);
+
+        $this->authenticate($user);
+    }
+
+    public function authenticate(UserInterface $user)
+    {
+        $this->user = $user;
+
+        if (! $this->session->regenerate()) {
+            return false;
+        };
+
+        $this->session->put('user', $user->getId());
+
+        return true;
     }
 }
