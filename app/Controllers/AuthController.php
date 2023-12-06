@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Auth;
+use App\Contracts\AuthInterface;
 use App\Entities\User;
 use App\Exceptions\ValidationException;
 use Doctrine\ORM\EntityManager;
@@ -13,7 +14,11 @@ use Valitron\Validator;
 
 class AuthController
 {
-    public function __construct(private readonly Twig $twig, private readonly EntityManager $em, private readonly Auth $auth)
+    public function __construct(
+        private readonly Twig $twig,
+        private readonly EntityManager $em,
+        private readonly AuthInterface $auth
+    )
     {
     }
 

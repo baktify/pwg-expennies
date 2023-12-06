@@ -24,9 +24,7 @@ class Auth implements AuthInterface
             return $this->user;
         }
 
-        $userId = $this->session->get('user');
-
-        if ($userId === null) {
+        if (($userId = $this->session->get('user')) === null) {
             return null;
         }
 
