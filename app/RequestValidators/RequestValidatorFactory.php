@@ -20,6 +20,7 @@ class RequestValidatorFactory implements RequestValidatorFactoryInterface
             return $requestValidator;
         }
 
+        // TODO: Create custom exception instead of the one below
         throw new \RuntimeException('Failed to create a ' . $class . ' request validator class');
     }
 }

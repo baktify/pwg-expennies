@@ -20,6 +20,7 @@ use Doctrine\ORM\ORMSetup;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\App;
+use Slim\Csrf\Guard;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
@@ -78,7 +79,9 @@ return [
 
     ResponseFactoryInterface::class => fn(App $app) => $app->getResponseFactory(),
     AuthInterface::class => fn(ContainerInterface $container) => $container->get(Auth::class),
-    UserProviderServiceInterface::class => fn(ContainerInterface $container) => $container->get(UserProviderService::class),
+    UserProviderServiceInterface::class => fn(ContainerInterface $container) => $container->get(
+        UserProviderService::class
+    ),
     SessionInterface::class => function (Config $config) {
         return new Session(new SessionConfig(
             $config->get('session.name', 'expennies'),
@@ -88,5 +91,10 @@ return [
             $config->get('session.samesite', SameSite::Lax),
         ));
     },
-    RequestValidatorFactoryInterface::class => fn(ContainerInterface $container) => $container->get(RequestValidatorFactory::class)
+    RequestValidatorFactoryInterface::class => fn(ContainerInterface $container) => $container->get(
+        RequestValidatorFactory::class
+    ),
+    'csrf' => fn(ResponseFactoryInterface $responseFactory) => new Guard(
+        $responseFactory, persistentTokenMode: true
+    ),
 ];
