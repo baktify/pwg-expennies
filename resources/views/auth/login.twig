@@ -16,7 +16,7 @@
                                     Login
                                 </h2>
                                 <form method="post" action="/login">
-                                    {{ csrf.fields | raw }}
+                                    {% include 'form/csrf.twig' %}
                                     <div class="form-outline form-white mb-4">
                                         <input type="email"
                                                name="email"

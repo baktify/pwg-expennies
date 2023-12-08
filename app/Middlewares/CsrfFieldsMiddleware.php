@@ -27,22 +27,12 @@ class CsrfFieldsMiddleware implements MiddlewareInterface
         $csrfTokenName = $csrf->getTokenName();
         $csrfTokenValueKey = $csrf->getTokenValueKey();
         $csrfTokenValue = $csrf->getTokenValue();
-        $fields = <<<CsrfField
-            <input type="hidden" name="$csrfTokenNameKey" value="$csrfTokenName">
-            <input type="hidden" name="$csrfTokenValueKey" value="$csrfTokenValue">
-        CsrfField;
-
 
         $this->twig->getEnvironment()->addGlobal('csrf', [
-//            'keys' => [
-//                'name' => $csrfTokenNameKey,
-//                'value' => $csrfTokenValueKey,
-//            ],
-//            'values' => [
-//                'name' => $csrfTokenName,
-//                'value' => $csrfTokenValue,
-//            ],
-            'fields' => $fields,
+            'nameKey' => $csrfTokenNameKey,
+            'name' => $csrfTokenName,
+            'valueKey' => $csrfTokenValueKey,
+            'value' => $csrfTokenValue,
         ]);
 
         return $handler->handle($request);
