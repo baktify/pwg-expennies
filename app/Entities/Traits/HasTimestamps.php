@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace App\Entities\Traits;
 
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Mapping\Column;
@@ -15,7 +15,7 @@ trait HasTimestamps
     private \DateTime $updatedAt;
 
     #[PrePersist]
-    public function updateTimestamp(PrePersistEventArgs $args)
+    public function updateTimestamps(PrePersistEventArgs $args): void
     {
         if (!isset($this->created_at)) {
             $this->setCreatedAt(new \DateTime());

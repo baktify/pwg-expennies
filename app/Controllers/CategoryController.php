@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
@@ -43,7 +45,7 @@ class CategoryController
     {
         // TODO: Validate the id
 
-        $this->categoryService->delete($args['id']);
+        $this->categoryService->delete((int) $args['id']);
 
         return $response
             ->withHeader('Location', '/categories')

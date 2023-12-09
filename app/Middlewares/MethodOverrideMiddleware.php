@@ -14,7 +14,7 @@ class MethodOverrideMiddleware implements MiddlewareInterface
         $methodName = $request->getHeaderLine('X-Http-Method-Override');
 
         if ($methodName) {
-            $request->withMethod($methodName);
+            $request = $request->withMethod($methodName);
         } elseif (strtoupper($request->getMethod()) === 'POST') {
             $body = $request->getParsedBody();
 

@@ -3,7 +3,7 @@
 namespace App\Entities;
 
 use App\Contracts\UserInterface;
-use App\Traits\HasTimestamps;
+use App\Entities\Traits\HasTimestamps;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;

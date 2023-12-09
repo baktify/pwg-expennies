@@ -63,7 +63,7 @@
                             <td>{{ category.createdAt | date('d/m/Y g:i a') }}</td>
                             <td>{{ category.updatedAt | date('d/m/Y g:i a') }}</td>
                             <td>
-                                <div class="d-flex flex-">
+                                <div class="d-flex">
                                     <form action="/categories/{{ category.id }}" method="post">
                                         {% include 'form/csrf.twig' %}
                                         {% include 'form/method/delete.twig' %}
