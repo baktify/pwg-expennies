@@ -3,7 +3,7 @@
 declare(strict_types = 1);
 
 use App\Controllers\AuthController;
-use App\Controllers\CategoriesController;
+use App\Controllers\CategoryController;
 use App\Controllers\HomeController;
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\GuestMiddleware;
@@ -23,8 +23,8 @@ return function (App $app) {
     $app->post('/logout', [AuthController::class, 'logOut'])->add(AuthMiddleware::class);
 
     $app->group('/categories', function(RouteCollectorProxy $categories){
-        $categories->get('', [CategoriesController::class, 'index']);
-        $categories->post('', [CategoriesController::class, 'store']);
-        $categories->delete('{id:[0-9]+}', [CategoriesController::class, 'delete']);
+        $categories->get('', [CategoryController::class, 'index']);
+        $categories->post('', [CategoryController::class, 'store']);
+        $categories->delete('/{id:[0-9]+}', [CategoryController::class, 'delete']);
     })->add(AuthMiddleware::class);
 };

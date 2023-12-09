@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Middlewares\CsrfFieldsMiddleware;
+use App\Middlewares\MethodOverrideMiddleware;
 use App\Middlewares\SessionStartMiddleware;
 use App\Middlewares\TwigValidationErrorsMiddleware;
 use App\Middlewares\TwigValidationOldValuesMiddleware;
@@ -13,6 +14,8 @@ use Slim\Views\TwigMiddleware;
 
 return function (App $app) {
     $container = $app->getContainer();
+
+    $app->add(MethodOverrideMiddleware::class);
 
     $app->add(CsrfFieldsMiddleware::class);
 

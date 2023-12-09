@@ -3,20 +3,21 @@
 namespace App\Entities;
 
 use App\Contracts\UserInterface;
+use App\Traits\HasTimestamps;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToMany;
-use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\Table;
 
 #[Entity, Table('users'), HasLifecycleCallbacks]
 class User implements UserInterface
 {
+    use HasTimestamps;
+
     #[Id, GeneratedValue, Column(options: ['unsigned' => true])]
     private int $id;
 
@@ -29,27 +30,11 @@ class User implements UserInterface
     #[Column]
     private string $name;
 
-    #[Column(name: 'created_at')]
-    private \DateTime $createdAt;
-
-    #[Column(name: 'updated_at')]
-    private \DateTime $updatedAt;
-
     #[OneToMany(mappedBy: 'user', targetEntity: Category::class, cascade: ['persist', 'remove'])]
     private Collection $categories;
 
     #[OneToMany(mappedBy: 'user', targetEntity: Transaction::class, cascade: ['persist', 'remove'])]
     private Collection $transactions;
-
-    #[PrePersist]
-    public function updateTimestamp(PrePersistEventArgs $args)
-    {
-        if (!isset($this->created_at)) {
-            $this->setCreatedAt(new \DateTime());
-        }
-
-        $this->setUpdatedAt(new \DateTime());
-    }
 
     public function getId(): int
     {
