@@ -6,7 +6,6 @@ use Psr\Http\Message\ResponseInterface;
 
 class ResponseFormatter
 {
-
     public function asJson(
         ResponseInterface $response,
         mixed $data,
