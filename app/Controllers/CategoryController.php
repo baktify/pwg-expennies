@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\RequestValidators\CategoryCreateRequestValidator;
+use App\ResponseFormatter;
 use App\Services\CategoryService;
 use Slim\Views\Twig;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -17,6 +18,7 @@ class CategoryController
         private readonly Twig $twig,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly CategoryService $categoryService,
+        private readonly ResponseFormatter $responseFormatter,
     )
     {
     }
@@ -50,5 +52,18 @@ class CategoryController
         return $response
             ->withHeader('Location', '/categories')
             ->withStatus(302);
+    }
+
+    public function getOne(Request $request, Response $response, array $args): Response
+    {
+        $category = $this->categoryService->getById((int) $args['id']);
+
+        if (!$category) {
+            return $response->withStatus(404);
+        }
+
+        $data = ['id' => $category->getId(), 'name' => $category->getName()];
+
+        return $this->responseFormatter->asJson($response, $data);
     }
 }

@@ -39,4 +39,9 @@ class CategoryService
         $this->em->remove($category);
         $this->em->flush();
     }
+
+    public function getById(int $id): ?Category
+    {
+        return $this->em->getRepository(Category::class)->find($id);
+    }
 }

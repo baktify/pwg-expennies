@@ -7,11 +7,17 @@ use App\Controllers\CategoryController;
 use App\Controllers\HomeController;
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\GuestMiddleware;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app) {
     $app->get('/', [HomeController::class, 'index'])->add(AuthMiddleware::class);
+
+    $app->get('/test', function (ServerRequestInterface $request, ResponseInterface $response) {
+        return $response;
+    });
 
     $app->group('', function (RouteCollectorProxy $guest) {
         $guest->get('/login', [AuthController::class, 'loginView']);
@@ -26,5 +32,6 @@ return function (App $app) {
         $categories->get('', [CategoryController::class, 'index']);
         $categories->post('', [CategoryController::class, 'store']);
         $categories->delete('/{id:[0-9]+}', [CategoryController::class, 'delete']);
+        $categories->get('/{id:[0-9]+}', [CategoryController::class, 'getOne']);
     })->add(AuthMiddleware::class);
 };
