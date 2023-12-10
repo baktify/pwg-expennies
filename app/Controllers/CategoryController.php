@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
-use App\RequestValidators\CategoryCreateRequestValidator;
+use App\RequestValidators\CreateCategoryRequestValidator;
+use App\RequestValidators\UpdateCategoryRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
 use Slim\Views\Twig;
@@ -32,7 +33,7 @@ class CategoryController
 
     public function store(Request $request, Response $response): Response
     {
-        $data = $this->requestValidatorFactory->make(CategoryCreateRequestValidator::class)->validate(
+        $data = $this->requestValidatorFactory->make(CreateCategoryRequestValidator::class)->validate(
             $request->getParsedBody()
         );
 
@@ -65,5 +66,26 @@ class CategoryController
         $data = ['id' => $category->getId(), 'name' => $category->getName()];
 
         return $this->responseFormatter->asJson($response, $data);
+    }
+
+    public function update(Request $request, Response $response, array $args): Response
+    {
+        $categoryId = (int) $args['id'];
+        $category = $this->categoryService->getById($categoryId);
+
+        if (!$category) {
+            return $response->withStatus(404);
+        }
+
+        $data = $this->requestValidatorFactory->make(UpdateCategoryRequestValidator::class)->validate(
+            $request->getParsedBody()
+        );
+
+        $category = $this->categoryService->update($categoryId, $data['name']);
+
+        return $this->responseFormatter->asJson($response, [
+            'id' => $categoryId,
+            'name' => $category->getName(),
+        ]);
     }
 }

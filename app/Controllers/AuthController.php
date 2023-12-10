@@ -51,7 +51,9 @@ class AuthController
 
     public function register(Request $request, Response $response): Response
     {
-        $data = $this->requestValidatorFactory->make(UserRegisterRequestValidator::class)->validate($request->getParsedBody());
+        $data = $this->requestValidatorFactory->make(UserRegisterRequestValidator::class)->validate(
+            $request->getParsedBody()
+        );
 
         $this->auth->register(
             new UserRegisterData($data['name'], $data['email'], $data['password'])

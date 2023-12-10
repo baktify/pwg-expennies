@@ -44,4 +44,14 @@ class CategoryService
     {
         return $this->em->getRepository(Category::class)->find($id);
     }
+
+    public function update(int $categoryId, string $name): Category
+    {
+        $category = $this->em->getRepository(Category::class)->find($categoryId);
+        $category->setName($name);
+
+        $this->em->flush();
+
+        return $category;
+    }
 }

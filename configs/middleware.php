@@ -15,7 +15,7 @@ use Slim\Views\TwigMiddleware;
 return function (App $app) {
     $container = $app->getContainer();
 
-    $app->add(MethodOverrideMiddleware::class);
+    $app->add($container->get(MethodOverrideMiddleware::class));
 
     $app->add(CsrfFieldsMiddleware::class);
 
@@ -30,6 +30,8 @@ return function (App $app) {
     $app->add(TwigValidationOldValuesMiddleware::class);
 
     $app->add(SessionStartMiddleware::class);
+
+    $app->addBodyParsingMiddleware();
 
     $app->add(new Zeuxisoo\Whoops\Slim\WhoopsMiddleware());
 };

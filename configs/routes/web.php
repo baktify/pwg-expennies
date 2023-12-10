@@ -33,5 +33,6 @@ return function (App $app) {
         $categories->post('', [CategoryController::class, 'store']);
         $categories->delete('/{id:[0-9]+}', [CategoryController::class, 'delete']);
         $categories->get('/{id:[0-9]+}', [CategoryController::class, 'getOne']);
+        $categories->post('/{id:[0-9]+}', [CategoryController::class, 'update']);
     })->add(AuthMiddleware::class);
 };
