@@ -1,42 +1,5 @@
 import {Modal} from "bootstrap"
-
-window.addEventListener('DOMContentLoaded', function () {
-    const editCategoryModal = new Modal(document.getElementById('editCategoryModal'))
-    const editCategoryButtons = document.querySelectorAll('.edit-category-btn')
-
-    editCategoryButtons.forEach(button =>
-        button.addEventListener('click', (event) => {
-            const categoryId = event.currentTarget.getAttribute('data-id')
-
-            fetch(`/categories/${categoryId}`)
-                .then(response => response.json())
-                .then(json => openEditCategoryModal(editCategoryModal, json))
-        })
-    )
-
-    document.querySelector('.save-category-btn')
-        .addEventListener('click', (event) => {
-            const categoryId = event.currentTarget.getAttribute('data-id')
-            const categoryName = editCategoryModal._element.querySelector('input[name="name"]').value
-
-            const makeRequest = async () => {
-                const response = await fetch(`/categories/${categoryId}`, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        _METHOD: 'PUT',
-                        name: categoryName,
-                        ...getCsrfFields()
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-
-                console.log(await response.json())
-            }
-            makeRequest();
-        });
-})
+import {getCategory, updateCategory} from "./ajax";
 
 const openEditCategoryModal = (modal, {id, name}) => {
     const nameInput = modal._element.querySelector('input[name="name"]')
@@ -47,14 +10,27 @@ const openEditCategoryModal = (modal, {id, name}) => {
     modal.show()
 }
 
-const getCsrfFields = () => {
-    const csrfNameKey = document.querySelector('#csrfName').getAttribute('name')
-    const csrfName = document.querySelector('#csrfName').getAttribute('content')
-    const csrfValueKey = document.querySelector('#csrfValue').getAttribute('name')
-    const csrfValue = document.querySelector('#csrfValue').getAttribute('content')
+window.addEventListener('DOMContentLoaded', function () {
+    const editCategoryModal = new Modal(document.getElementById('editCategoryModal'))
+    const editCategoryButtons = document.querySelectorAll('.edit-category-btn')
 
-    return {
-        [csrfNameKey]: csrfName,
-        [csrfValueKey]: csrfValue
-    }
-}
+    editCategoryButtons.forEach(button =>
+        button.addEventListener('click', (event) => {
+            const categoryId = event.currentTarget.getAttribute('data-id')
+
+            getCategory(categoryId).then(
+                data => openEditCategoryModal(editCategoryModal, data)
+            )
+
+        })
+    )
+
+    document.querySelector('.save-category-btn')
+        .addEventListener('click', (event) => {
+            const categoryId = event.currentTarget.getAttribute('data-id')
+            const categoryName = editCategoryModal._element.querySelector('input[name="name"]').value
+
+            updateCategory(categoryId, categoryName)
+        });
+
+})

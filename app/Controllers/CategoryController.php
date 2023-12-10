@@ -70,8 +70,7 @@ class CategoryController
 
     public function update(Request $request, Response $response, array $args): Response
     {
-        $categoryId = (int) $args['id'];
-        $category = $this->categoryService->getById($categoryId);
+        $category = $this->categoryService->getById((int) $args['id']);
 
         if (!$category) {
             return $response->withStatus(404);
@@ -81,11 +80,11 @@ class CategoryController
             $request->getParsedBody()
         );
 
-        $category = $this->categoryService->update($categoryId, $data['name']);
+        $categoryUpdated = $this->categoryService->update($category, $data['name']);
 
         return $this->responseFormatter->asJson($response, [
-            'id' => $categoryId,
-            'name' => $category->getName(),
+            'id' => $categoryUpdated->getId(),
+            'name' => $categoryUpdated->getName(),
         ]);
     }
 }
