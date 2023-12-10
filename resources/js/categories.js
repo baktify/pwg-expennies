@@ -23,6 +23,7 @@ window.addEventListener('DOMContentLoaded', function () {
                 const response = await fetch(`/categories/${categoryId}`, {
                     method: 'POST',
                     body: JSON.stringify({
+                        _METHOD: 'PUT',
                         name: categoryName,
                         ...getCsrfFields()
                     }),

@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use App\Middlewares\CsrfFieldsMiddleware;
-use App\Middlewares\MethodOverrideMiddleware;
 use App\Middlewares\SessionStartMiddleware;
 use App\Middlewares\TwigValidationErrorsMiddleware;
 use App\Middlewares\TwigValidationOldValuesMiddleware;
 use App\Middlewares\ValidationExceptionMiddleware;
 use Slim\App;
+use Slim\Middleware\MethodOverrideMiddleware;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 

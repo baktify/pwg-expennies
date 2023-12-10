@@ -16,6 +16,7 @@ return function (App $app) {
     $app->get('/', [HomeController::class, 'index'])->add(AuthMiddleware::class);
 
     $app->get('/test', function (ServerRequestInterface $request, ResponseInterface $response) {
+        dump($request);
         return $response;
     });
 
@@ -33,6 +34,6 @@ return function (App $app) {
         $categories->post('', [CategoryController::class, 'store']);
         $categories->delete('/{id:[0-9]+}', [CategoryController::class, 'delete']);
         $categories->get('/{id:[0-9]+}', [CategoryController::class, 'getOne']);
-        $categories->post('/{id:[0-9]+}', [CategoryController::class, 'update']);
+        $categories->put('/{id:[0-9]+}', [CategoryController::class, 'update']);
     })->add(AuthMiddleware::class);
 };
