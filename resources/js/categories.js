@@ -1,5 +1,5 @@
 import {Modal} from "bootstrap"
-import {getCategory, updateCategory} from "./ajax";
+import {getCategory, updateCategory} from "./requests";
 
 const openEditCategoryModal = (modal, {id, name}) => {
     const nameInput = modal._element.querySelector('input[name="name"]')
@@ -30,7 +30,9 @@ window.addEventListener('DOMContentLoaded', function () {
             const categoryId = event.currentTarget.getAttribute('data-id')
             const categoryName = editCategoryModal._element.querySelector('input[name="name"]').value
 
-            updateCategory(categoryId, categoryName)
+            updateCategory(categoryId, categoryName).then(
+                json => console.log(json)
+            )
         });
 
 })
