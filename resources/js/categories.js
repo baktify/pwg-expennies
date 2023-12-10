@@ -1,5 +1,5 @@
 import {Modal} from "bootstrap"
-import {getCategory, updateCategory} from "./requests";
+import {getCategory, updateCategory, deleteCategory} from "./requests";
 
 const openEditCategoryModal = (modal, {id, name}) => {
     const nameInput = modal._element.querySelector('input[name="name"]')
@@ -30,9 +30,20 @@ window.addEventListener('DOMContentLoaded', function () {
             const categoryId = event.currentTarget.getAttribute('data-id')
             const categoryName = editCategoryModal._element.querySelector('input[name="name"]').value
 
-            updateCategory(categoryId, categoryName).then(
-                json => console.log(json)
-            )
+            updateCategory(categoryId, categoryName, editCategoryModal._element).then(data => {
+                if (data.status === 200) {
+                    editCategoryModal.hide()
+                }
+            })
         });
 
+    document.querySelectorAll('.delete-category-btn').forEach(item => {
+        item.addEventListener('click', (event) => {
+            const categoryId = event.currentTarget.getAttribute('data-id')
+
+            if (confirm(`Do you want to delete category ${categoryId}?`)) {
+                deleteCategory(categoryId)
+            }
+        });
+    })
 })
