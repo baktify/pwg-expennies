@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
+use App\Entities\Category;
 use App\RequestValidators\CreateCategoryRequestValidator;
 use App\RequestValidators\UpdateCategoryRequestValidator;
 use App\ResponseFormatter;
@@ -16,19 +17,17 @@ use Psr\Http\Message\ResponseInterface as Response;
 class CategoryController
 {
     public function __construct(
-        private readonly Twig $twig,
+        private readonly Twig                             $twig,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
-        private readonly CategoryService $categoryService,
-        private readonly ResponseFormatter $responseFormatter,
+        private readonly CategoryService                  $categoryService,
+        private readonly ResponseFormatter                $responseFormatter,
     )
     {
     }
 
     public function index(Request $request, Response $response): Response
     {
-        $categories = $this->categoryService->getAll();
-
-        return $this->twig->render($response, 'categories/index.twig', compact('categories'));
+        return $this->twig->render($response, 'categories/index.twig');
     }
 
     public function store(Request $request, Response $response): Response
@@ -48,14 +47,14 @@ class CategoryController
     {
         // TODO: Validate the id
 
-        $this->categoryService->delete((int) $args['id']);
+        $this->categoryService->delete((int)$args['id']);
 
         return $response;
     }
 
     public function getOne(Request $request, Response $response, array $args): Response
     {
-        $category = $this->categoryService->getById((int) $args['id']);
+        $category = $this->categoryService->getById((int)$args['id']);
 
         if (!$category) {
             return $response->withStatus(404);
@@ -68,7 +67,7 @@ class CategoryController
 
     public function update(Request $request, Response $response, array $args): Response
     {
-        $category = $this->categoryService->getById((int) $args['id']);
+        $category = $this->categoryService->getById((int)$args['id']);
 
         if (!$category) {
             return $response->withStatus(404);
@@ -83,6 +82,27 @@ class CategoryController
         return $this->responseFormatter->asJson($response, [
             'id' => $category->getId(),
             'name' => $category->getName(),
+        ]);
+    }
+
+    public function load(Request $request, Response $response, array $args): Response
+    {
+        $params = $request->getQueryParams();
+
+        $categories = array_map(function (Category $category) {
+            return [
+                'id' => $category->getId(),
+                'name' => $category->getName(),
+                'createdAt' => $category->getCreatedAt()->format('d/m/Y g:i A'),
+                'updatedAt' => $category->getUpdatedAt()->format('d/m/Y g:i A'),
+            ];
+        }, $this->categoryService->getAll());
+
+        return $this->responseFormatter->asJson($response, [
+            'data' => $categories,
+            'draw' => (int)$params['draw'],
+            'recordsTotal' => count($categories),
+            'recordsFiltered' => count($categories),
         ]);
     }
 }

@@ -33,6 +33,7 @@ return function (App $app) {
 
     $app->group('/categories', function(RouteCollectorProxy $categories){
         $categories->get('', [CategoryController::class, 'index']);
+        $categories->get('/load', [CategoryController::class, 'load']);
         $categories->post('', [CategoryController::class, 'store']);
         $categories->delete('/{id:[0-9]+}', [CategoryController::class, 'delete']);
         $categories->get('/{id:[0-9]+}', [CategoryController::class, 'getOne']);
