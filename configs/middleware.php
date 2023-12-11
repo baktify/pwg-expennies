@@ -15,7 +15,7 @@ use Slim\Views\TwigMiddleware;
 return function (App $app) {
     $container = $app->getContainer();
 
-    $app->add($container->get(MethodOverrideMiddleware::class));
+    $app->add(MethodOverrideMiddleware::class);
 
     $app->add(CsrfFieldsMiddleware::class);
 

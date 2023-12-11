@@ -1,4 +1,5 @@
 import axios from "axios";
+import config from "bootstrap/js/src/util/config";
 
 const axe = axios.create({
     baseURL: 'http://localhost:8000',
@@ -34,7 +35,10 @@ export const updateCategory = async (id, newName, domElement) => {
 export const deleteCategory = async (id) => {
     await axe.post(`/categories/${id}`, {
         ...getCsrfFields(),
-        _METHOD: 'DELETE'
+    }, {
+        headers: {
+            'X-Http-Method-Override': 'DELETE'
+        }
     })
 }
 

@@ -16,7 +16,9 @@ return function (App $app) {
     $app->get('/', [HomeController::class, 'index'])->add(AuthMiddleware::class);
 
     $app->get('/test', function (ServerRequestInterface $request, ResponseInterface $response) {
-        dump($request);
+        /** @var \Doctrine\ORM\EntityManager $em */
+        $em = $this->get(\Doctrine\ORM\EntityManager::class);
+
         return $response;
     });
 

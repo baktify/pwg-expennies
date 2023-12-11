@@ -78,11 +78,11 @@ class CategoryController
             $request->getParsedBody()
         );
 
-        $categoryUpdated = $this->categoryService->update($category, $data['name']);
+        $category = $this->categoryService->update($category, $data['name']);
 
         return $this->responseFormatter->asJson($response, [
-            'id' => $categoryUpdated->getId(),
-            'name' => $categoryUpdated->getName(),
+            'id' => $category->getId(),
+            'name' => $category->getName(),
         ]);
     }
 }

@@ -3,7 +3,6 @@
 namespace App;
 
 use Closure;
-use http\Env\Response;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,9 +16,11 @@ class Csrf
 
     public function failureHandler(): Closure
     {
-        return fn(
-            ServerRequestInterface  $request,
-            RequestHandlerInterface $handler
-        ): ResponseInterface => $this->responseFactory->createResponse()->withStatus(403);
+        return function (ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
+            $response = $this->responseFactory->createResponse();
+            $response->getBody()->write('Csrf token not provided or invalid');
+
+            return $response->withStatus(419);
+        };
     }
 }
