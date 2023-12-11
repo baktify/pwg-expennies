@@ -1,5 +1,4 @@
 import axios from "axios";
-import config from "bootstrap/js/src/util/config";
 
 const axe = axios.create({
     baseURL: 'http://localhost:8000',
@@ -25,10 +24,11 @@ export const updateCategory = async (id, newName, domElement) => {
 
         return {status, data}
     } catch ({response: {status, data}}) {
-        return handleErrors({
-            status,
-            errors: data
-        }, domElement)
+        const response = {status, errors: data}
+
+        handleErrors(response, domElement)
+
+        return response
     }
 }
 
@@ -57,11 +57,14 @@ const getCsrfFields = () => {
 const handleErrors = ({errors}, domElement) => {
     for (const error in errors) {
         const input = domElement.querySelector(`input[name="${error}"]`)
+        const inputParent = input.parentElement
+
         input.classList.add('is-invalid')
 
         for (const message of errors[error]) {
             const errorDiv = `<div class="invalid-feedback">${message}</div>`
-            input.parentElement.innerHTML += errorDiv
+
+            inputParent.innerHTML += errorDiv
         }
     }
 }
