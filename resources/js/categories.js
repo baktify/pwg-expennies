@@ -4,7 +4,6 @@ import DataTable from "datatables.net"
 
 const openEditCategoryModal = (modal, {id, name}) => {
     const nameInput = modal._element.querySelector('input[name="name"]')
-
     nameInput.value = name
 
     modal._element.querySelector('.save-category-btn').setAttribute('data-id', id)
@@ -13,7 +12,6 @@ const openEditCategoryModal = (modal, {id, name}) => {
 
 window.addEventListener('DOMContentLoaded', function () {
     const editCategoryModal = new Modal(document.getElementById('editCategoryModal'))
-    // const editCategoryButtons = document.querySelectorAll('.edit-category-btn')
 
     const table = new DataTable('#categoriesTable', {
         serverSide: true,
@@ -40,7 +38,7 @@ window.addEventListener('DOMContentLoaded', function () {
     })
 
     document.querySelector('#categoriesTable').addEventListener('click', (event) => {
-        const editBtn   = event.target.closest('.edit-category-btn')
+        const editBtn = event.target.closest('.edit-category-btn')
         const deleteBtn = event.target.closest('.delete-category-btn')
 
         if (editBtn) {
@@ -49,25 +47,16 @@ window.addEventListener('DOMContentLoaded', function () {
             getCategory(categoryId).then(
                 data => openEditCategoryModal(editCategoryModal, data)
             )
-        } else {
+        }
+
+        if (deleteBtn) {
             const categoryId = deleteBtn.getAttribute('data-id')
 
             if (confirm(`Do you want to delete category ${categoryId}?`)) {
-                deleteCategory(categoryId)
+                deleteCategory(categoryId).then(() => table.draw())
             }
         }
     })
-
-    // editCategoryButtons.forEach(button =>
-    //     button.addEventListener('click', (event) => {
-    //         const categoryId = event.currentTarget.getAttribute('data-id')
-    //
-    //         getCategory(categoryId).then(
-    //             data => openEditCategoryModal(editCategoryModal, data)
-    //         )
-    //
-    //     })
-    // )
 
     document.querySelector('.save-category-btn')
         .addEventListener('click', (event) => {
@@ -81,14 +70,4 @@ window.addEventListener('DOMContentLoaded', function () {
                 }
             })
         });
-
-    // document.querySelectorAll('.delete-category-btn').forEach(item => {
-    //     item.addEventListener('click', (event) => {
-    //         const categoryId = event.currentTarget.getAttribute('data-id')
-    //
-    //         if (confirm(`Do you want to delete category ${categoryId}?`)) {
-    //             deleteCategory(categoryId)
-    //         }
-    //     });
-    // })
 })
