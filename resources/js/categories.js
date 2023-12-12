@@ -18,17 +18,17 @@ window.addEventListener('DOMContentLoaded', function () {
         ajax: '/categories/load',
         orderMulti: false,
         columns: [
-            {data: 'name'},
-            {data: 'createdAt'},
-            {data: 'updatedAt'},
+            {data: (category) => category.name},
+            {data: (category) => category.createdAt},
+            {data: (category) => category.name},
             {
                 sortable: false,
-                data: row => `
+                data: (category) => `
                     <div class="d-flex">
-                        <button class="ms-2 btn btn-outline-primary delete-category-btn" data-id="${row.id}">
+                        <button class="ms-2 btn btn-outline-primary delete-category-btn" data-id="${category.id}">
                             <i class="bi bi-trash3-fill"></i>
                         </button>
-                        <button class="ms-2 btn btn-outline-primary edit-category-btn" data-id="${row.id}">
+                        <button class="ms-2 btn btn-outline-primary edit-category-btn" data-id="${category.id}">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
                     </div>
