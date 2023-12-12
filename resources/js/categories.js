@@ -18,9 +18,10 @@ window.addEventListener('DOMContentLoaded', function () {
         ajax: '/categories/load',
         orderMulti: false,
         columns: [
-            {data: (category) => category.name},
-            {data: (category) => category.createdAt},
-            {data: (category) => category.name},
+            {data: "name"},
+            // {data: (category) => category.name}, // alternative
+            {data: "createdAt"},
+            {data: "updatedAt"},
             {
                 sortable: false,
                 data: (category) => `

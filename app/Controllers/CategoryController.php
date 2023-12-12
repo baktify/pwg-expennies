@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
+use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
-use App\RequestValidators\CreateCategoryRequestValidator;
+use App\RequestValidators\CategoryLoadRequestValidator;
+use App\RequestValidators\CategoryCreateRequestValidator;
 use App\RequestValidators\UpdateCategoryRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
+use App\Services\RequestService;
 use Slim\Views\Twig;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -21,6 +24,7 @@ class CategoryController
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly CategoryService                  $categoryService,
         private readonly ResponseFormatter                $responseFormatter,
+        private readonly RequestService                   $requestService,
     )
     {
     }
@@ -32,7 +36,7 @@ class CategoryController
 
     public function store(Request $request, Response $response): Response
     {
-        $data = $this->requestValidatorFactory->make(CreateCategoryRequestValidator::class)->validate(
+        $data = $this->requestValidatorFactory->make(CategoryCreateRequestValidator::class)->validate(
             $request->getParsedBody()
         );
 
@@ -87,9 +91,9 @@ class CategoryController
 
     public function load(Request $request, Response $response, array $args): Response
     {
-        $params = $request->getQueryParams();
+        $params = $this->requestService->getDataTableQueryParams($request);
 
-        $categories = $this->categoryService->getPaginatedCategories((int)$params['start'], (int)$params['length']);
+        $categories = $this->categoryService->getPaginatedCategories($params);
         $totalCategories = count($categories);
 
         $mapper = function (Category $category) {
@@ -101,11 +105,11 @@ class CategoryController
             ];
         };
 
-        return $this->responseFormatter->asJson($response, [
-            'data' => array_map($mapper, (array)$categories->getIterator()),
-            'draw' => (int)$params['draw'],
-            'recordsTotal' => $totalCategories,
-            'recordsFiltered' => $totalCategories,
-        ]);
+        return $this->responseFormatter->asDataTable(
+            $response,
+            array_map($mapper, (array)$categories->getIterator()),
+            $params->draw,
+            $totalCategories,
+        );
     }
 }

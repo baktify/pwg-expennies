@@ -4,8 +4,10 @@ namespace App\Entities\Traits;
 
 use App\Entities\User;
 use Doctrine\ORM\Event\PrePersistEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\PrePersist;
+use Doctrine\ORM\Mapping\PreUpdate;
 
 trait HasTimestamps
 {
@@ -22,6 +24,14 @@ trait HasTimestamps
             $this->setCreatedAt(new \DateTime());
         }
 
+        if (!isset($this->updatedAt)) {
+            $this->setUpdatedAt(new \DateTime());
+        }
+    }
+
+    #[PreUpdate]
+    public function updateUpdatedAt(PreUpdateEventArgs $args): void
+    {
         $this->setUpdatedAt(new \DateTime());
     }
 

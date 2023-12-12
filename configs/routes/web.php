@@ -5,33 +5,16 @@ declare(strict_types = 1);
 use App\Controllers\AuthController;
 use App\Controllers\CategoryController;
 use App\Controllers\HomeController;
+use App\Controllers\SeedController;
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\GuestMiddleware;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app) {
     $app->get('/', [HomeController::class, 'index'])->add(AuthMiddleware::class);
 
-    $app->get('/test', function (ServerRequestInterface $request, ResponseInterface $response) {
-        $faker = Faker\Factory::create();
-
-        /** @var \Doctrine\ORM\EntityManager $em */
-        $em = $this->get(\Doctrine\ORM\EntityManager::class);
-        $user = $em->find(\App\Entities\User::class, 1);
-
-        for ($i = 0; $i < 85; $i++) {
-            $category  = new \App\Entities\Category();
-            $category->setName(ucfirst($faker->word()));
-            $category->setUser($user);
-
-            $em->persist($category);
-        }
-        $em->flush();
-        return $response;
-    });
+    $app->get('/seed', [SeedController::class, 'index']);
 
     $app->group('', function (RouteCollectorProxy $guest) {
         $guest->get('/login', [AuthController::class, 'loginView']);
