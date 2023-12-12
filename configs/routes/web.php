@@ -20,11 +20,11 @@ return function (App $app) {
 
         /** @var \Doctrine\ORM\EntityManager $em */
         $em = $this->get(\Doctrine\ORM\EntityManager::class);
-        $user = $em->find(\App\Entities\User::class, 8);
+        $user = $em->find(\App\Entities\User::class, 1);
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 85; $i++) {
             $category  = new \App\Entities\Category();
-            $category->setName($faker->word());
+            $category->setName(ucfirst($faker->word()));
             $category->setUser($user);
 
             $em->persist($category);

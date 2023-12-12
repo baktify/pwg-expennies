@@ -90,6 +90,7 @@ class CategoryController
         $params = $request->getQueryParams();
 
         $categories = $this->categoryService->getPaginatedCategories((int)$params['start'], (int)$params['length']);
+        $totalCategories = count($categories);
 
         $mapper = function (Category $category) {
             return [
@@ -99,8 +100,6 @@ class CategoryController
                 'updatedAt' => $category->getUpdatedAt()->format('d/m/Y g:i A'),
             ];
         };
-
-        $totalCategories = count($categories);
 
         return $this->responseFormatter->asJson($response, [
             'data' => array_map($mapper, (array)$categories->getIterator()),
