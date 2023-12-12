@@ -21,11 +21,14 @@ class ResponseFormatter
 
     public function asDataTable(ResponseInterface $response, array $data, int $draw, int $totalCategories): ResponseInterface
     {
-        return $this->asJson($response, [
-            'data' => $data,
-            'draw' => $draw,
-            'recordsTotal' => $totalCategories,
-            'recordsFiltered' => $totalCategories,
-        ]);
+        return $this->asJson(
+            $response,
+            [
+                'data' => $data,
+                'draw' => $draw,
+                'recordsTotal' => $totalCategories,
+                'recordsFiltered' => $totalCategories,
+            ]
+        );
     }
 }

@@ -33,9 +33,9 @@ class SeedController
     {
         $faker = Factory::create();
 
-        for ($i = 0; $i < 85; $i++) {
-            $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
 
+        for ($i = 0; $i < 85; $i++) {
             $category  = new Category();
             $category->setName(ucfirst($faker->word()));
             $category->setUser($user);

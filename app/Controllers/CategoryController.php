@@ -96,14 +96,12 @@ class CategoryController
         $categories = $this->categoryService->getPaginatedCategories($params);
         $totalCategories = count($categories);
 
-        $mapper = function (Category $category) {
-            return [
-                'id' => $category->getId(),
-                'name' => $category->getName(),
-                'createdAt' => $category->getCreatedAt()->format('d/m/Y g:i A'),
-                'updatedAt' => $category->getUpdatedAt()->format('d/m/Y g:i A'),
-            ];
-        };
+        $mapper = fn(Category $category) => [
+            'id' => $category->getId(),
+            'name' => $category->getName(),
+            'createdAt' => $category->getCreatedAt()->format('d/m/Y g:i A'),
+            'updatedAt' => $category->getUpdatedAt()->format('d/m/Y g:i A'),
+        ];
 
         return $this->responseFormatter->asDataTable(
             $response,
