@@ -8,6 +8,24 @@ const axe = axios.create({
     }
 })
 
+export const createCategory = async (name, domElement) => {
+    try {
+        clearErrors(domElement)
+
+        const {status, data} = await axe.post(`/categories`, {
+            name,
+            ...getCsrfFields()
+        })
+        return {status, data}
+    } catch ({response: {status, data}}) {
+        const response = {status, errors: data}
+
+        handleErrors(response, domElement)
+
+        return response
+    }
+}
+
 export const getCategory = async (id) => {
     const {data} = await axe.get(`/categories/${id}`)
     return data

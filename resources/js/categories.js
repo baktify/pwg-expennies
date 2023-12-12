@@ -1,5 +1,5 @@
 import {Modal} from "bootstrap"
-import {getCategory, updateCategory, deleteCategory} from "./requests";
+import {createCategory, getCategory, updateCategory, deleteCategory} from "./requests";
 import DataTable from "datatables.net"
 
 const openEditCategoryModal = (modal, {id, name}) => {
@@ -12,6 +12,7 @@ const openEditCategoryModal = (modal, {id, name}) => {
 
 window.addEventListener('DOMContentLoaded', function () {
     const editCategoryModal = new Modal(document.getElementById('editCategoryModal'))
+    const createCategoryModal = new Modal(document.getElementById('createCategoryModal'))
 
     const table = new DataTable('#categoriesTable', {
         serverSide: true,
@@ -59,16 +60,29 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     })
 
-    document.querySelector('.save-category-btn')
-        .addEventListener('click', (event) => {
-            const categoryId = event.currentTarget.getAttribute('data-id')
-            const categoryName = editCategoryModal._element.querySelector('input[name="name"]').value
+    document.querySelector('.save-category-btn').addEventListener('click', (event) => {
+        const categoryId = event.currentTarget.getAttribute('data-id')
+        const categoryName = editCategoryModal._element.querySelector('input[name="name"]').value
 
-            updateCategory(categoryId, categoryName, editCategoryModal._element).then(data => {
-                if (data.status === 200) {
-                    table.draw()
-                    editCategoryModal.hide()
-                }
-            })
-        });
+        updateCategory(categoryId, categoryName, editCategoryModal._element).then(data => {
+            if (data.status === 200) {
+                table.draw()
+                editCategoryModal.hide()
+            }
+        })
+    });
+
+    document.forms.categoryCreate.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const nameInput = event.target.elements.name
+
+        createCategory(nameInput.value, createCategoryModal._element).then(response => {
+            if(response.status === 200){
+                table.draw()
+                createCategoryModal.hide()
+                event.target.reset()
+            }
+        })
+    })
 })

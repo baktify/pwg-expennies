@@ -6,7 +6,7 @@ use App\Contracts\RequestValidatorInterface;
 use App\Exceptions\ValidationException;
 use Valitron\Validator;
 
-class UpdateCategoryRequestValidator implements RequestValidatorInterface
+class CategoryUpdateRequestValidator implements RequestValidatorInterface
 {
     public function validate(array $data): array
     {

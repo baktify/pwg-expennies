@@ -9,7 +9,7 @@ use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
 use App\RequestValidators\CategoryLoadRequestValidator;
 use App\RequestValidators\CategoryCreateRequestValidator;
-use App\RequestValidators\UpdateCategoryRequestValidator;
+use App\RequestValidators\CategoryUpdateRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
 use App\Services\RequestService;
@@ -42,9 +42,13 @@ class CategoryController
 
         $category = $this->categoryService->create($data['name'], $request->getAttribute('user'));
 
-        return $response
-            ->withHeader('Location', '/categories')
-            ->withStatus(302);
+        return $this->responseFormatter->asJson(
+            $response,
+            [
+                'id' => $category->getId(),
+                'name' => $category->getName(),
+            ]
+        );
     }
 
     public function delete(Request $request, Response $response, array $args): Response
@@ -64,9 +68,13 @@ class CategoryController
             return $response->withStatus(404);
         }
 
-        $data = ['id' => $category->getId(), 'name' => $category->getName()];
-
-        return $this->responseFormatter->asJson($response, $data);
+        return $this->responseFormatter->asJson(
+            $response,
+            [
+                'id' => $category->getId(),
+                'name' => $category->getName()
+            ]
+        );
     }
 
     public function update(Request $request, Response $response, array $args): Response
@@ -77,7 +85,7 @@ class CategoryController
             return $response->withStatus(404);
         }
 
-        $data = $this->requestValidatorFactory->make(UpdateCategoryRequestValidator::class)->validate(
+        $data = $this->requestValidatorFactory->make(CategoryUpdateRequestValidator::class)->validate(
             $request->getParsedBody()
         );
 
