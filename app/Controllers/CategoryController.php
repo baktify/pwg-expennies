@@ -104,18 +104,25 @@ class CategoryController
         $categories = $this->categoryService->getPaginatedCategories($params);
         $totalCategories = count($categories);
 
-        $mapper = fn(Category $category) => [
-            'id' => $category->getId(),
-            'name' => $category->getName(),
-            'createdAt' => $category->getCreatedAt()->format('d/m/Y g:i A'),
-            'updatedAt' => $category->getUpdatedAt()->format('d/m/Y g:i A'),
-        ];
+        $mapper = $this->categoryService->categoryMapper(true);
 
         return $this->responseFormatter->asDataTable(
             $response,
             array_map($mapper, (array)$categories->getIterator()),
             $params->draw,
             $totalCategories,
+        );
+    }
+
+    public function list(Request $request, Response $response, array $args): Response
+    {
+        $categories = $this->categoryService->getAll();
+
+        $mapper = $this->categoryService->categoryMapper();
+
+        return $this->responseFormatter->asJson(
+            $response,
+            array_map($mapper, $categories)
         );
     }
 }

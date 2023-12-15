@@ -77,4 +77,21 @@ class CategoryService
 
         return new Paginator($query);
     }
+
+    public function categoryMapper(bool $withTimestamps = false): callable
+    {
+        return function (Category $category) use ($withTimestamps) {
+            $mapper = [
+                'id' => $category->getId(),
+                'name' => $category->getName(),
+            ];
+
+            if ($withTimestamps) {
+                $mapper['createdAt'] = $category->getCreatedAt()->format('d/m/Y g:i A');
+                $mapper['updatedAt'] = $category->getUpdatedAt()->format('d/m/Y g:i A');
+            }
+
+            return $mapper;
+        };
+    }
 }

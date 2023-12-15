@@ -8,6 +8,72 @@ const axe = axios.create({
     }
 })
 
+export const updateTransaction = async (transactionId, transaction, parentDom) => {
+    try {
+        clearErrors(parentDom)
+
+        const {status, data} = await axe.put(`/transactions/${transactionId}`, {
+            ...transaction,
+            ...getCsrfFields()
+        })
+
+        return {status, data}
+    } catch ({response: {status, data: errors}}) {
+        handleErrors(errors, parentDom)
+
+        return {status, errors}
+    }
+}
+
+export const getTransaction = async (transactionId, parentDom) => {
+    try {
+        clearErrors(parentDom)
+
+        const {status, data} = await axe.get(`/transactions/${transactionId}`)
+
+        return {status, data}
+    } catch ({response: {status, data: errors}}) {
+        return {status, errors}
+    }
+}
+
+export const deleteTransaction = async (transactionId) => {
+    await axe.post(`/transactions/${transactionId}`, {
+        ...getCsrfFields()
+    }, {
+        headers: {
+            'X-Http-Method-Override': 'DELETE'
+        }
+    });
+}
+
+export const createTransaction = async (transaction, parentDom) => {
+     try {
+         clearErrors(parentDom)
+
+         const {status, data} = await axe.post(`/transactions`, {
+             ...transaction,
+             ...getCsrfFields(),
+         })
+
+         return {status, data}
+     } catch ({response: {status, data: errors}}) {
+         handleErrors(errors, parentDom)
+
+         return {status, errors}
+     }
+}
+
+export const getCategories = async () => {
+    try {
+        const {status, data} = await axe.get('/categories/list')
+
+        return {status, data}
+    } catch ({response}) {
+        console.log(response)
+    }
+}
+
 export const createCategory = async (name, domElement) => {
     try {
         clearErrors(domElement)
@@ -17,12 +83,10 @@ export const createCategory = async (name, domElement) => {
             ...getCsrfFields()
         })
         return {status, data}
-    } catch ({response: {status, data}}) {
-        const response = {status, errors: data}
+    } catch ({response: {status, data: errors}}) {
+        handleErrors(errors, domElement)
 
-        handleErrors(response, domElement)
-
-        return response
+        return {status, errors}
     }
 }
 
@@ -41,12 +105,10 @@ export const updateCategory = async (id, newName, domElement) => {
         })
 
         return {status, data}
-    } catch ({response: {status, data}}) {
-        const response = {status, errors: data}
+    } catch ({response: {status, data: errors}}) {
+        handleErrors(errors, domElement)
 
-        handleErrors(response, domElement)
-
-        return response
+        return {status, errors}
     }
 }
 
@@ -72,7 +134,7 @@ const getCsrfFields = () => {
     }
 }
 
-const handleErrors = ({errors}, domElement) => {
+const handleErrors = (errors, domElement) => {
     for (const error in errors) {
         const input = domElement.querySelector(`input[name="${error}"]`)
         const inputParent = input.parentElement

@@ -6,6 +6,8 @@ use App\Controllers\AuthController;
 use App\Controllers\CategoryController;
 use App\Controllers\HomeController;
 use App\Controllers\SeedController;
+use App\Controllers\TestController;
+use App\Controllers\TransactionController;
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\GuestMiddleware;
 use Slim\App;
@@ -13,6 +15,7 @@ use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app) {
     $app->get('/', [HomeController::class, 'index'])->add(AuthMiddleware::class);
+    $app->get('/test', [TestController::class, 'test']);
 
     $app->get('/seed', [SeedController::class, 'index']);
 
@@ -27,10 +30,20 @@ return function (App $app) {
 
     $app->group('/categories', function(RouteCollectorProxy $categories){
         $categories->get('', [CategoryController::class, 'index']);
+        $categories->get('/list', [CategoryController::class, 'list']);
         $categories->get('/load', [CategoryController::class, 'load']);
         $categories->post('', [CategoryController::class, 'store']);
         $categories->delete('/{id:[0-9]+}', [CategoryController::class, 'delete']);
         $categories->get('/{id:[0-9]+}', [CategoryController::class, 'getOne']);
         $categories->put('/{id:[0-9]+}', [CategoryController::class, 'update']);
+    })->add(AuthMiddleware::class);
+
+    $app->group('/transactions', function (RouteCollectorProxy $transactions) {
+        $transactions->get('', [TransactionController::class, 'index']);
+        $transactions->get('/load', [TransactionController::class, 'load']);
+        $transactions->post('', [TransactionController::class, 'store']);
+        $transactions->get('/{id:[0-9]+}', [TransactionController::class, 'getOne']);
+        $transactions->delete('/{id:[0-9]+}', [TransactionController::class, 'delete']);
+        $transactions->put('/{id:[0-9]+}', [TransactionController::class, 'update']);
     })->add(AuthMiddleware::class);
 };

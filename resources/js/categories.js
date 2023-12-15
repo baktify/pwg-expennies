@@ -72,7 +72,7 @@ window.addEventListener('DOMContentLoaded', function () {
         })
     });
 
-    document.forms.categoryCreate.addEventListener('submit', (event) => {
+    document.forms.createCategory.addEventListener('submit', (event) => {
         event.preventDefault();
 
         const nameInput = event.target.elements.name
