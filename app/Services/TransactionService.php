@@ -35,11 +35,10 @@ class TransactionService
         $allowedColumns = ['description', 'date', 'amount', 'user', 'category', 'createdAt', 'updatedAt'];
         $orderBy = in_array($params->orderBy, $allowedColumns) ? $params->orderBy : 'updatedAt';
         $orderDir = $params->orderDir === 'desc' ? 'desc' : 'asc';
-        $query->orderBy('t.' . $orderBy, $orderDir);
 
         match ($orderBy) {
-            'category' => $query->orderBy('c.name', $orderDir),
             'user' => $query->orderBy('u.name', $orderDir),
+            'category' => $query->orderBy('c.name', $orderDir),
             default => $query->orderBy('t.' . $orderBy, $orderDir),
         };
 

@@ -76,11 +76,7 @@ class TransactionController
 
     public function getOne(Request $request, Response $response, array $args): Response
     {
-        $data = $this->requestValidatorFactory->make(TransactionGetRequestValidator::class)->validate(
-            $args
-        );
-
-        $transaction = $this->transactionService->getOne((int)$data['id']);
+        $transaction = $this->transactionService->getOne((int)$args['id']);
 
         if (!$transaction) {
             return $this->responseFormatter->asJson(

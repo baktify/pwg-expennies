@@ -135,7 +135,7 @@ const getCsrfFields = () => {
 
 const handleErrors = (errors, domElement) => {
     for (const error in errors) {
-        const input = domElement.querySelector(`input[name="${error}"]`)
+        const input = domElement.querySelector(`[name="${error}"]`)
         const inputParent = input.parentElement
 
         input.classList.add('is-invalid')
