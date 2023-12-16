@@ -19,7 +19,8 @@ class TransactionCreateRequestValidator implements RequestValidatorInterface
         $v = new Validator($data);
 
         $v->rule('required', ['description', 'amount', 'date']);
-        $v->rule('date', 'date');
+        $v->rule('lengthMax', 'description', 255);
+        $v->rule('dateFormat', 'date', 'Y-m-d\TH:i');
         $v->rule('numeric', 'amount');
         $v->rule('optional', 'categoryId');
 
