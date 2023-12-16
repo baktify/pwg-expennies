@@ -30,7 +30,6 @@ export const getTransaction = async (transactionId, parentDom) => {
         clearErrors(parentDom)
 
         const {status, data} = await axe.get(`/transactions/${transactionId}`)
-
         return {status, data}
     } catch ({response: {status, data: errors}}) {
         return {status, errors}

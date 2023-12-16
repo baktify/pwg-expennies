@@ -62,11 +62,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             getTransaction(transactionId, editTransactionModal._element)
                 .then(({status, data}) => {
-                if (status === 200) {
-                    editTransactionModal.show()
-                    fillEditTransactionModalWithData(data, transactionId)
-                }
-            })
+                    if (status === 200) {
+                        editTransactionModal.show()
+                        fillEditTransactionModalWithData(data, transactionId)
+                    }
+                })
         }
     }
 
@@ -88,7 +88,13 @@ document.addEventListener('DOMContentLoaded', function () {
         columns: [
             {data: 'description'},
             {data: 'date'},
-            {data: 'amount'},
+            // {data: 'amount'},
+            {
+                data: (row) => new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD'
+                }).format(row.amount)
+            },
             {data: 'user'},
             {data: 'category'},
             {data: 'createdAt'},

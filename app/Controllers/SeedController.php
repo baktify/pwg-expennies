@@ -22,7 +22,7 @@ class SeedController
 
     public function index(ServerRequestInterface $request, ResponseInterface $response)
     {
-//        $this->seedAdmin();
+        $this->seedUsers();
         $this->seedCategories();
 
         $response->getBody()->write('Seeding finished successfully.');
@@ -47,10 +47,22 @@ class SeedController
         $this->em->flush();
     }
 
-    private function seedAdmin()
+    private function seedUsers()
     {
         $this->userProviderService->createUser(
             new UserRegisterData('Bakyt Zhan', 'bako@mail.ru', '123')
+        );
+        $this->userProviderService->createUser(
+            new UserRegisterData('Ansar Sansyzbai', 'ansar@mail.ru', '123')
+        );
+        $this->userProviderService->createUser(
+            new UserRegisterData('Ainazym Sansyzbai', 'ainaz@mail.ru', '123')
+        );
+        $this->userProviderService->createUser(
+            new UserRegisterData('Ayan Sansyzbai', 'ayan@mail.ru', '123')
+        );
+        $this->userProviderService->createUser(
+            new UserRegisterData('Zhiger Sansyzbai', 'zhiger@mail.ru', '123')
         );
     }
 }

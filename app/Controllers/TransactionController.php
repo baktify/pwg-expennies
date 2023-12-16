@@ -43,7 +43,7 @@ class TransactionController
         $totalTransactions = count($transactions);
 
         $mapper = $this->transactionService->getDataTableMapper();
-//dd((array)$transactions->getIterator());
+
         return $this->responseFormatter->asDataTable(
             $response,
             array_map($mapper, (array)$transactions->getIterator()),
