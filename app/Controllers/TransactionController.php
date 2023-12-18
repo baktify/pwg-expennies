@@ -107,11 +107,7 @@ class TransactionController
 
     public function delete(Request $request, Response $response, array $args): Response
     {
-        $data = $this->requestValidatorFactory->make(TransactionGetRequestValidator::class)->validate(
-            $args
-        );
-
-        $result = $this->transactionService->delete((int)$data['id']);
+        $result = $this->transactionService->delete((int)$args['id']);
 
         if (!$result) {
             return $this->responseFormatter->asJson(

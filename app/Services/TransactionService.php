@@ -137,6 +137,7 @@ class TransactionService
         if (!$transaction) {
             return false;
         }
+
         $this->em->remove($transaction);
         $this->em->flush();
 
