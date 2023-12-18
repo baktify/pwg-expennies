@@ -5,16 +5,19 @@ import {
     createTransaction,
     deleteTransaction,
     getTransaction,
-    updateTransaction
+    updateTransaction,
+    uploadTransactionReceipts
 } from "./requests";
 
 document.addEventListener('DOMContentLoaded', function () {
     let categories = [];
 
     const createTransactionModal = new Modal('#createTransactionModal')
-    const createTransactionForm = document.forms.createTransaction
     const editTransactionModal = new Modal('#editTransactionModal')
+    const uploadTransactionReceiptsModal = new Modal('#uploadReceiptsModal')
+    const createTransactionForm = document.forms.createTransaction
     const editTransactionForm = document.forms.editTransaction
+    const uploadTransactionReceiptsForm = document.forms.uploadTransactionReceipts
     const createTransactionCategorySelectInput = createTransactionForm.elements.categoryId
     const editTransactionCategorySelectInput = editTransactionForm.elements.categoryId
     const transactionsTable = document.getElementById('transactionsTable')
@@ -42,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
         dateInput.value = data.date
     }
 
-    const onDeleteTransaction = (event) => {
-        const deleteBtn = event.target.closest('.delete-category-btn')
+    const onTransactionDeleteClick = (event) => {
+        const deleteBtn = event.target.closest('.delete-transaction-btn')
 
         if (deleteBtn) {
             const transactionId = deleteBtn.getAttribute('data-id')
@@ -54,19 +57,29 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    const onEditTransaction = (event) => {
-        const editBtn = event.target.closest('.edit-category-btn')
+    const onTransactionEditClick = (event) => {
+        const editBtn = event.target.closest('.edit-transaction-btn')
 
         if (editBtn) {
             const transactionId = editBtn.getAttribute('data-id')
 
-            getTransaction(transactionId, editTransactionModal._element)
-                .then(({status, data}) => {
-                    if (status === 200) {
-                        editTransactionModal.show()
-                        fillEditTransactionModalWithData(data, transactionId)
-                    }
-                })
+            getTransaction(transactionId, editTransactionModal._element).then(({status, data}) => {
+                if (status === 200) {
+                    editTransactionModal.show()
+                    fillEditTransactionModalWithData(data, transactionId)
+                }
+            })
+        }
+    }
+
+    const onTransactionReceiptsUploadClick = (event) => {
+        const uploadBtn = event.target.closest('.upload-transaction-receipts-btn')
+
+        if (uploadBtn) {
+            const transactionId = uploadBtn.getAttribute('data-id')
+            uploadTransactionReceiptsForm.querySelector('[type="submit"]').setAttribute('data-id', transactionId)
+
+            uploadTransactionReceiptsModal.show()
         }
     }
 
@@ -103,11 +116,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 sortable: false,
                 data: (transaction) => `
                     <div class="d-flex">
-                        <button class="ms-2 btn btn-outline-primary delete-category-btn" data-id="${transaction.id}">
+                        <button class="ms-2 btn btn-outline-primary delete-transaction-btn" data-id="${transaction.id}">
                             <i class="bi bi-trash3-fill"></i>
                         </button>
-                        <button class="ms-2 btn btn-outline-primary edit-category-btn" data-id="${transaction.id}">
+                        <button class="ms-2 btn btn-outline-primary edit-transaction-btn" data-id="${transaction.id}">
                             <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button class="ms-2 btn btn-outline-primary upload-transaction-receipts-btn" data-id="${transaction.id}">
+                            <i class="bi bi-upload"></i>
                         </button>
                     </div>
                 `
@@ -115,7 +131,12 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     })
 
-    /** New transaction request */
+    transactionsTable.addEventListener('click', onTransactionDeleteClick)
+
+    transactionsTable.addEventListener('click', onTransactionEditClick)
+
+    transactionsTable.addEventListener('click', onTransactionReceiptsUploadClick)
+
     createTransactionForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
@@ -133,13 +154,6 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 
-    /** Delete transaction request */
-    transactionsTable.addEventListener('click', onDeleteTransaction)
-
-    /** Edit transaction request */
-    transactionsTable.addEventListener('click', onEditTransaction)
-
-    /** Update transaction request */
     editTransactionForm.addEventListener('submit', (event) => {
         event.preventDefault()
 
@@ -154,6 +168,21 @@ document.addEventListener('DOMContentLoaded', function () {
             if (status === 200) {
                 editTransactionModal.hide()
                 table.draw()
+            }
+        })
+    })
+
+    uploadTransactionReceiptsForm.addEventListener('submit', (event) => {
+        event.preventDefault()
+
+        const transactionId = uploadTransactionReceiptsForm.elements.submit.getAttribute('data-id')
+        const receiptFiles = uploadTransactionReceiptsForm.elements.receipts.files
+
+        uploadTransactionReceipts(
+            transactionId, receiptFiles, uploadTransactionReceiptsModal._element
+        ).then(({status, data}) => {
+            if (status === 200) {
+                console.log(200)
             }
         })
     })

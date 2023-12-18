@@ -8,6 +8,26 @@ const axe = axios.create({
     }
 })
 
+/** Transaction requests */
+export const uploadTransactionReceipts = async (transactionId, receiptFiles, parentDom) => {
+    try {
+        console.log(receiptFiles)
+        const response = await axe.post(`/transactions/${transactionId}/receipts`, {
+            ...getCsrfFields(),
+            receiptFiles,
+            _METHOD: 'PUT'
+        }, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        })
+
+        return response
+    } catch (error) {
+        return error
+    }
+}
+
 export const updateTransaction = async (transactionId, transaction, parentDom) => {
     try {
         clearErrors(parentDom)
@@ -47,22 +67,23 @@ export const deleteTransaction = async (transactionId) => {
 }
 
 export const createTransaction = async (transaction, parentDom) => {
-     try {
-         clearErrors(parentDom)
+    try {
+        clearErrors(parentDom)
 
-         const {status, data} = await axe.post(`/transactions`, {
-             ...transaction,
-             ...getCsrfFields(),
-         })
+        const {status, data} = await axe.post(`/transactions`, {
+            ...transaction,
+            ...getCsrfFields(),
+        })
 
-         return {status, data}
-     } catch ({response: {status, data: errors}}) {
-         handleErrors(errors, parentDom)
+        return {status, data}
+    } catch ({response: {status, data: errors}}) {
+        handleErrors(errors, parentDom)
 
-         return {status, errors}
-     }
+        return {status, errors}
+    }
 }
 
+/** Category requests */
 export const getCategories = async () => {
     try {
         const {status, data} = await axe.get('/categories/list')
@@ -121,6 +142,7 @@ export const deleteCategory = async (id) => {
     })
 }
 
+/** Error handlers and CSRF generator */
 const getCsrfFields = () => {
     const csrfNameKey = document.querySelector('#csrfName').getAttribute('name')
     const csrfName = document.querySelector('#csrfName').getAttribute('content')

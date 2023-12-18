@@ -5,6 +5,7 @@ declare(strict_types = 1);
 use App\Controllers\AuthController;
 use App\Controllers\CategoryController;
 use App\Controllers\HomeController;
+use App\Controllers\ReceiptController;
 use App\Controllers\SeedController;
 use App\Controllers\TestController;
 use App\Controllers\TransactionController;
@@ -45,5 +46,6 @@ return function (App $app) {
         $transactions->get('/{id:[0-9]+}', [TransactionController::class, 'getOne']);
         $transactions->delete('/{id:[0-9]+}', [TransactionController::class, 'delete']);
         $transactions->put('/{id:[0-9]+}', [TransactionController::class, 'update']);
+        $transactions->put('/{id:[0-9]+}/receipts', [ReceiptController::class, 'store']);
     })->add(AuthMiddleware::class);
 };

@@ -1,0 +1,29 @@
+<div class="modal fade" id="uploadReceiptsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form name="uploadTransactionReceipts" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Receipts for transactions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-outline form-white mb-4">
+                        <input type="file" name="receipts" multiple
+                               class="form-control form-control-lg"
+                               placeholder="Receipts"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Close
+                    </button>
+                    <button type="submit" name="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Upload files
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
