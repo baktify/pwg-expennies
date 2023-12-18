@@ -78,16 +78,16 @@ class TransactionController
     {
         $transaction = $this->transactionService->getOne((int)$args['id']);
 
-        if (!$transaction) {
+        if ($transaction) {
             return $this->responseFormatter->asJson(
-                $response->withStatus(404),
-                ['message' => 'Transaction not found']
+                $response,
+                $this->transactionService->toArray($transaction, false)
             );
         }
 
         return $this->responseFormatter->asJson(
-            $response,
-            $this->transactionService->toArray($transaction, false)
+            $response->withStatus(404),
+            ['message' => 'Transaction not found']
         );
     }
 

@@ -21,7 +21,7 @@ class TransactionUpdateRequestValidator implements RequestValidatorInterface
 
         $v->rule('required', ['id', 'description', 'amount', 'date']);
         $v->rule('lengthMax', 'description', 255);
-        $v->rule('dateFormat', 'date', 'm/d/Y g:i A');
+        $v->rule('dateFormat', 'date', 'Y-m-d\TH:i');
         $v->rule('numeric', 'amount');
         $v->rule('optional', 'categoryId');
 
