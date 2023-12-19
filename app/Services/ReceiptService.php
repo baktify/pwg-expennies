@@ -18,12 +18,12 @@ class ReceiptService
     {
     }
 
-    public function create($transaction, string $filename, string $storagename): Receipt
+    public function create($transaction, string $filename, string $storageFilename): Receipt
     {
         $receipt = new Receipt();
         $receipt->setTransaction($transaction);
         $receipt->setFilename($filename);
-        $receipt->setStorageFilename($storagename);
+        $receipt->setStorageFilename($storageFilename);
         $receipt->setCreatedAt(new \DateTime());
 
         $this->em->persist($receipt);
@@ -37,11 +37,11 @@ class ReceiptService
         foreach ($receipts as $uploadFile) {
             $filename = $uploadFile->getClientFilename();
             $fileContents = $uploadFile->getStream()->getContents();
-            $randomFilename = bin2hex(random_bytes(25));
+            $storageFilename = bin2hex(random_bytes(25));
 
-            $this->filesystem->write('receipts/' . $randomFilename, $fileContents);
+            $this->filesystem->write('receipts/' . $storageFilename, $fileContents);
 
-            $this->create($transaction, $filename, $randomFilename);
+            $this->create($transaction, $filename, $storageFilename);
         }
     }
 }

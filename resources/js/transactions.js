@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
         dateInput.value = data.date
     }
 
-    const onTransactionDeleteClick = (event) => {
+    const onClickTransactionDelete = (event) => {
         const deleteBtn = event.target.closest('.delete-transaction-btn')
 
         if (deleteBtn) {
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    const onTransactionEditClick = (event) => {
+    const onClickTransactionEdit = (event) => {
         const editBtn = event.target.closest('.edit-transaction-btn')
 
         if (editBtn) {
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    const onTransactionReceiptsUploadClick = (event) => {
+    const onClickTransactionReceiptsUpload = (event) => {
         const uploadBtn = event.target.closest('.upload-transaction-receipts-btn')
 
         if (uploadBtn) {
@@ -131,11 +131,11 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     })
 
-    transactionsTable.addEventListener('click', onTransactionDeleteClick)
+    transactionsTable.addEventListener('click', onClickTransactionDelete)
 
-    transactionsTable.addEventListener('click', onTransactionEditClick)
+    transactionsTable.addEventListener('click', onClickTransactionEdit)
 
-    transactionsTable.addEventListener('click', onTransactionReceiptsUploadClick)
+    transactionsTable.addEventListener('click', onClickTransactionReceiptsUpload)
 
     createTransactionForm.addEventListener('submit', (event) => {
         event.preventDefault();
