@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 use App\Enums\AppEnvironment;
 use App\Enums\SameSite;
+use App\Enums\StorageDriver;
 
 $appEnv = $_ENV['APP_ENV'] ?? AppEnvironment::Production->value;
 $appSnakeName = strtolower(str_replace(' ', '_', $_ENV['APP_NAME']));
@@ -34,5 +35,8 @@ return [
         'secure' => true,
         'httponly' => true,
         'samesite' => SameSite::Lax,
+    ],
+    'storage' => [
+        'driver' => StorageDriver::Local,
     ]
 ];

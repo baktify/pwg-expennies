@@ -12,12 +12,15 @@ use App\Csrf;
 use App\DataObjects\SessionConfig;
 use App\Enums\AppEnvironment;
 use App\Enums\SameSite;
+use App\Enums\StorageDriver;
 use App\RequestValidators\RequestValidatorFactory;
 use App\Services\UserProviderService;
 use App\Session;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\App;
@@ -85,13 +88,15 @@ return [
         UserProviderService::class
     ),
     SessionInterface::class => function (Config $config) {
-        return new Session(new SessionConfig(
-            $config->get('session.name', 'expennies'),
-            $config->get('session.flashName', 'flash'),
-            $config->get('session.secure', true),
-            $config->get('session.httponly', true),
-            $config->get('session.samesite', SameSite::Lax),
-        ));
+        return new Session(
+            new SessionConfig(
+                $config->get('session.name', 'expennies'),
+                $config->get('session.flashName', 'flash'),
+                $config->get('session.secure', true),
+                $config->get('session.httponly', true),
+                $config->get('session.samesite', SameSite::Lax),
+            )
+        );
     },
     RequestValidatorFactoryInterface::class => fn(ContainerInterface $container) => $container->get(
         RequestValidatorFactory::class
@@ -99,4 +104,11 @@ return [
     'csrf' => fn(ResponseFactoryInterface $responseFactory, Csrf $csrf) => new Guard(
         $responseFactory, failureHandler: $csrf->failureHandler(), persistentTokenMode: true
     ),
+    Filesystem::class => function (Config $config) {
+        $adapter = match ($config->get('storage.driver')) {
+            StorageDriver::Local => new LocalFilesystemAdapter(STORAGE_PATH),
+        };
+
+        return new Filesystem($adapter);
+    },
 ];

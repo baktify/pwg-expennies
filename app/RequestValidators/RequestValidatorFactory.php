@@ -16,7 +16,7 @@ class RequestValidatorFactory implements RequestValidatorFactoryInterface
     {
         $requestValidator = $this->container->get($class);
 
-        if($requestValidator instanceof RequestValidatorInterface) {
+        if ($requestValidator instanceof RequestValidatorInterface) {
             return $requestValidator;
         }
 

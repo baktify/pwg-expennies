@@ -176,10 +176,10 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault()
 
         const transactionId = uploadTransactionReceiptsForm.elements.submit.getAttribute('data-id')
-        const receiptFiles = uploadTransactionReceiptsForm.elements.receipts.files
+        const receipts = uploadTransactionReceiptsForm.elements.receipts.files
 
         uploadTransactionReceipts(
-            transactionId, receiptFiles, uploadTransactionReceiptsModal._element
+            transactionId, receipts, uploadTransactionReceiptsModal._element
         ).then(({status, data}) => {
             if (status === 200) {
                 console.log(200)

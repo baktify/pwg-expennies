@@ -9,12 +9,13 @@ const axe = axios.create({
 })
 
 /** Transaction requests */
-export const uploadTransactionReceipts = async (transactionId, receiptFiles, parentDom) => {
+export const uploadTransactionReceipts = async (transactionId, receipts, parentDom) => {
     try {
-        console.log(receiptFiles)
+        clearErrors(parentDom)
+
         const response = await axe.post(`/transactions/${transactionId}/receipts`, {
             ...getCsrfFields(),
-            receiptFiles,
+            receipts: receipts,
             _METHOD: 'PUT'
         }, {
             headers: {
@@ -23,8 +24,8 @@ export const uploadTransactionReceipts = async (transactionId, receiptFiles, par
         })
 
         return response
-    } catch (error) {
-        return error
+    } catch ({response: {status, data: errors}}) {
+        handleErrors(errors, parentDom)
     }
 }
 

@@ -15,8 +15,8 @@ class TestController
 
     public function test()
     {
-        $transaction = $this->em->getRepository(Transaction::class)->findOneBy([]);
 
-        dd($transaction->getCategory()->getName());
+        phpinfo();
+        die;
     }
 }

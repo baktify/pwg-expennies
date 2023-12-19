@@ -15,7 +15,7 @@ class Session implements SessionInterface
     public function start(): void
     {
         if ($this->isActive()) {
-            throw new SessionException('Session is already started');
+            throw new SessionException('Session has already started');
         }
 
         if (headers_sent($filename, $line)) {
