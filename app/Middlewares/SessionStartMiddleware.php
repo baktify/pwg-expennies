@@ -3,6 +3,7 @@
 namespace App\Middlewares;
 
 use App\Contracts\SessionInterface;
+use App\Services\RequestService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -12,7 +13,10 @@ use function MongoDB\BSON\toPHP;
 
 class SessionStartMiddleware implements MiddlewareInterface
 {
-    public function __construct(private readonly SessionInterface $session)
+    public function __construct(
+        private readonly SessionInterface $session,
+        private readonly RequestService $requestService,
+    )
     {
     }
 
@@ -20,8 +24,7 @@ class SessionStartMiddleware implements MiddlewareInterface
     {
         $this->session->start();
 
-        // TODO: Check if the request is not XHR request
-        if ($request->getMethod() === 'GET') {
+        if ($request->getMethod() === 'GET' && !$this->requestService->isXhr($request)) {
             $this->session->put('previousUrl', (string)$request->getUri());
         }
 

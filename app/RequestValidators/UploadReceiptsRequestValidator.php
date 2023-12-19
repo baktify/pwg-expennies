@@ -4,6 +4,7 @@ namespace App\RequestValidators;
 
 use App\Contracts\RequestValidatorInterface;
 use App\Exceptions\ValidationException;
+use League\MimeTypeDetection\FinfoMimeTypeDetector;
 use Psr\Http\Message\UploadedFileInterface;
 
 class UploadReceiptsRequestValidator implements RequestValidatorInterface
@@ -40,14 +41,13 @@ class UploadReceiptsRequestValidator implements RequestValidatorInterface
                 throw new ValidationException(['receipts' => ['Allowed extensions are pdf, png, jpg, jpeg.']]);
             }
 
-            $filepath = $uploadFile->getStream()->getMetadata('uri');
-            $extension = (new \finfo(FILEINFO_EXTENSION))->file($filepath);
-            if (!in_array($extension, $allowedExtensions)) {
-                throw new ValidationException(['receipts' => ['Invalid file']]);
-            }
+            $detector = new FinfoMimeTypeDetector();
+            $filePath = $uploadFile->getStream()->getMetadata('uri');
+            $fileContents = $uploadFile->getStream()->getContents();
 
-            $mimetype = (new \finfo(FILEINFO_MIME_TYPE))->file($filepath);
-            if (!in_array($mimetype, $allowedMimetypes)) {
+            $mimeType = $detector->detectMimeType($filePath, $fileContents);
+
+            if ( !in_array($mimeType, $allowedMimetypes)) {
                 throw new ValidationException(['receipts' => ['Invalid file']]);
             }
         }

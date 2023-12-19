@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entities;
 
+use App\Entities\Traits\HasTimestamps;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\Table;
@@ -15,8 +19,11 @@ class Receipt
     #[Id, GeneratedValue, Column(options: ['unsigned' => true])]
     private int $id;
 
-    #[Column(name: 'file_name')]
-    private string $fileName;
+    #[Column(name: 'filename')]
+    private string $filename;
+
+    #[Column(name: 'storage_filename')]
+    private string $storageFilename;
 
     #[Column(name: 'created_at')]
     private \DateTime $createdAt;
@@ -29,14 +36,25 @@ class Receipt
         return $this->id;
     }
 
-    public function getFileName(): string
+    public function getFilename(): string
     {
-        return $this->fileName;
+        return $this->filename;
     }
 
-    public function setFileName(string $fileName): Receipt
+    public function setFilename(string $filename): Receipt
     {
-        $this->fileName = $fileName;
+        $this->filename = $filename;
+        return $this;
+    }
+
+    public function getStorageFilename(): string
+    {
+        return $this->storageFilename;
+    }
+
+    public function setStorageFilename(string $storageFilename): Receipt
+    {
+        $this->storageFilename = $storageFilename;
         return $this;
     }
 

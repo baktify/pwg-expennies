@@ -53,9 +53,9 @@ class CategoryController
 
     public function delete(Request $request, Response $response, array $args): Response
     {
-        // TODO: Validate the id
-
-        $this->categoryService->delete((int)$args['id']);
+        if(!$this->categoryService->delete((int)$args['id'])) {
+            return $response->withStatus(404);
+        }
 
         return $response;
     }

@@ -34,12 +34,18 @@ class CategoryService
         return $this->em->getRepository(Category::class)->findAll();
     }
 
-    public function delete(int $id): void
+    public function delete(int $id): bool
     {
         $category = $this->em->getRepository(Category::class)->find($id);
 
+        if (!$category) {
+            return false;
+        }
+
         $this->em->remove($category);
         $this->em->flush();
+
+        return true;
     }
 
     public function getById(int $id): ?Category
