@@ -9,6 +9,34 @@ const axe = axios.create({
 })
 
 /** Transaction requests */
+export const uploadCsvTransactions = async (csvFile, parentDom) => {
+    try {
+        clearErrors(parentDom)
+
+        const {status, data} = await axe.post(`/transactions/upload-from-csv`, {
+            ...getCsrfFields(),
+            csvFile,
+        }, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        })
+
+        return {status, data}
+    } catch ({response: {status, data: errors}}) {
+        handleErrors(errors, parentDom)
+    }
+}
+
+export const deleteTransactionReceipt = async (transactionId, receiptId) => {
+    const {status, data} = await axe.post(`/transactions/${transactionId}/receipts/${receiptId}`, {
+        ...getCsrfFields(),
+        _METHOD: 'DELETE'
+    })
+
+    return {status, data}
+}
+
 export const uploadTransactionReceipts = async (transactionId, receipts, parentDom) => {
     try {
         clearErrors(parentDom)

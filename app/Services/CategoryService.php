@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\AuthInterface;
 use App\Contracts\UserInterface;
 use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
+use App\Entities\User;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CategoryService
 {
-    public function __construct(private readonly EntityManager $em)
+    public function __construct(
+        private readonly EntityManager $em,
+    )
     {
     }
 
@@ -51,6 +55,17 @@ class CategoryService
     public function getById(int $id): ?Category
     {
         return $this->em->getRepository(Category::class)->find($id);
+    }
+
+    public function getByNameOrNew(string $name, UserInterface $user): ?Category
+    {
+        $category = $this->em->getRepository(Category::class)->findOneBy(['name' => $name]);
+
+        if (!$category) {
+            $category = $this->create($name, $user);
+        }
+
+        return $category;
     }
 
     public function update(Category $category, string $name): Category

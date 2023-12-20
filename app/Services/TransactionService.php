@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\AuthInterface;
 use App\Contracts\UserInterface;
+use App\DataObjects\CsvTransactionData;
 use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
 use App\Entities\Receipt;
 use App\Entities\Transaction;
-use App\Entities\User;
+use App\Exceptions\ValidationException;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -19,6 +21,7 @@ class TransactionService
     public function __construct(
         private readonly EntityManager   $em,
         private readonly CategoryService $categoryService,
+        private readonly AuthInterface   $auth,
     )
     {
     }
@@ -162,5 +165,30 @@ class TransactionService
         $this->em->flush();
 
         return $transaction;
+    }
+
+    public function createFromArray(array $records): void
+    {
+        try {
+            $this->em->wrapInTransaction(function (EntityManager $em) use ($records) {
+                $user = $this->auth->user();
+
+                /** @var CsvTransactionData $record */
+                foreach ($records as $record) {
+                    $transaction = new Transaction();
+                    $transaction->setDate($record->date);
+                    $transaction->setDescription($record->description);
+                    $transaction->setAmount($record->amount);
+                    $transaction->setUser($user);
+
+                    $category = $this->categoryService->getByNameOrNew($record->category, $user);
+                    $transaction->setCategory($category);
+
+                    $em->persist($transaction);
+                }
+            });
+        } catch (\Throwable $e) {
+            throw new ValidationException(['csv' => ['Something went wrong, try again later']]);
+        }
     }
 }

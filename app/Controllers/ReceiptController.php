@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
-use App\Entities\Receipt;
 use App\RequestValidators\UploadReceiptsRequestValidator;
 use App\Services\ReceiptService;
 use App\Services\TransactionService;
@@ -45,22 +44,10 @@ class ReceiptController
 
     public function download(Request $request, Response $response, array $args): Response
     {
-        $transactionId = (int)$args['transactionId'];
-        $receiptId = (int)$args['receiptId'];
+        $receipt = $this->receiptService->getTransactionReceipt($args);
 
-        if (!$transactionId || !($transaction = $this->transactionService->getById($transactionId))) {
+        if (!$receipt) {
             return $response->withStatus(404);
-        }
-
-        if (!$receiptId || !($receipt = $this->receiptService->getById($receiptId))) {
-            return $response->withStatus(404);
-        }
-
-        if (!($transaction->getReceipts()
-            ->map(fn(Receipt $receipt) => $receipt->getId() === $receiptId)
-            ->count()
-        )) {
-            return $response->withStatus(401);
         }
 
         $response = $response
@@ -74,6 +61,21 @@ class ReceiptController
 
     public function delete(Request $request, Response $response, array $args): Response
     {
+        $receipt = $this->receiptService->getTransactionReceipt($args);
+
+        if (!$receipt) {
+            $response->getBody()->write('Transaction or receipt not found');
+            return $response->withStatus(404);
+        }
+
+        if (!$this->receiptService->delete($receipt)) {
+            $response->getBody()->write('Something went wrong');
+
+            return $response->withStatus(500);
+        }
+
+        $response->getBody()->write('Receipt deleted.');
+
         return $response;
     }
 }

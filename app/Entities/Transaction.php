@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entities;
 
 use App\Entities\Traits\HasTimestamps;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -41,6 +42,11 @@ class Transaction
 
     #[OneToMany(mappedBy: 'transaction', targetEntity: Receipt::class, cascade: ['persist', 'remove'])]
     private Collection $receipts;
+
+    public function __construct()
+    {
+        $this->receipts = new ArrayCollection();
+    }
 
     public function getId(): int
     {

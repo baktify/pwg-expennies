@@ -55,5 +55,6 @@ return function (App $app) {
             '/{transactionId:[0-9]+}/receipts/{receiptId:[0-9]+}',
             [ReceiptController::class, 'delete']
         );
+        $transactions->post('/upload-from-csv', [TransactionController::class, 'uploadFromCsv']);
     })->add(AuthMiddleware::class);
 };

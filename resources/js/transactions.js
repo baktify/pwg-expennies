@@ -6,7 +6,9 @@ import {
     deleteTransaction,
     getTransaction,
     updateTransaction,
-    uploadTransactionReceipts
+    uploadTransactionReceipts,
+    deleteTransactionReceipt,
+    uploadCsvTransactions
 } from "./requests";
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -15,9 +17,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const createTransactionModal = new Modal('#createTransactionModal')
     const editTransactionModal = new Modal('#editTransactionModal')
     const uploadTransactionReceiptsModal = new Modal('#uploadReceiptsModal')
+    const uploadTransactionsFromCsvModal = new Modal('#uploadTransactionsFromCsvModal')
     const createTransactionForm = document.forms.createTransaction
     const editTransactionForm = document.forms.editTransaction
     const uploadTransactionReceiptsForm = document.forms.uploadTransactionReceipts
+    const uploadTransactionsFromCsvForm = document.forms.uploadTransactionsFromCsv
     const createTransactionCategorySelectInput = createTransactionForm.elements.categoryId
     const editTransactionCategorySelectInput = editTransactionForm.elements.categoryId
     const transactionsTable = document.getElementById('transactionsTable')
@@ -83,6 +87,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    const onClickTransactionReceiptDelete = (event) => {
+        const deleteBtn = event.target.closest('.delete-receipt')
+
+        if (deleteBtn) {
+            const receiptId = deleteBtn.getAttribute('data-receipt-id')
+            const transactionId = deleteBtn.getAttribute('data-transaction-id')
+
+            if (confirm(`Do you want to delete the receipt ${receiptId}?`)) {
+                deleteTransactionReceipt(transactionId, receiptId).then(({status, data}) => {
+                    if (status === 200) {
+                        table.draw()
+                    }
+                })
+            }
+        }
+    }
+
     /** Getting categories on page load */
     getCategories().then(({status, data}) => {
         if (status === 200) {
@@ -121,8 +142,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <i class="bi bi-x-circle-fill delete-receipt text-danger"
                                     style="position: absolute; bottom: 10px; right: -5px;"
                                     role="button"
-                                    data-id="${id}" 
-                                    data-transactionId="${transactionId}">
+                                    data-receipt-id="${id}" 
+                                    data-transaction-id="${transactionId}">
                                 </i>
                             </span>
                         `
@@ -158,6 +179,8 @@ document.addEventListener('DOMContentLoaded', function () {
     transactionsTable.addEventListener('click', onClickTransactionEdit)
 
     transactionsTable.addEventListener('click', onClickTransactionReceiptsUpload)
+
+    transactionsTable.addEventListener('click', onClickTransactionReceiptDelete)
 
     createTransactionForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -206,6 +229,21 @@ document.addEventListener('DOMContentLoaded', function () {
             if (status === 200) {
                 table.draw()
                 uploadTransactionReceiptsModal.hide()
+            }
+        })
+    })
+
+    uploadTransactionsFromCsvForm.addEventListener('submit', (event) => {
+        event.preventDefault()
+
+        const csvFile = uploadTransactionsFromCsvForm.elements.csv.files[0]
+
+        uploadCsvTransactions(
+            csvFile, uploadTransactionsFromCsvModal._element
+        ).then(({status, data}) => {
+            if (status === 200) {
+                uploadTransactionsFromCsvModal.hide()
+                table.draw()
             }
         })
     })

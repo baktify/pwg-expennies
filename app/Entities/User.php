@@ -6,6 +6,7 @@ namespace App\Entities;
 
 use App\Contracts\UserInterface;
 use App\Entities\Traits\HasTimestamps;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -37,6 +38,12 @@ class User implements UserInterface
 
     #[OneToMany(mappedBy: 'user', targetEntity: Transaction::class, cascade: ['persist', 'remove'])]
     private Collection $transactions;
+
+    public function __construct()
+    {
+        $this->categories = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
+    }
 
     public function getId(): int
     {
