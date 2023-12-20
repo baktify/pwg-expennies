@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Entities\Category;
+use App\Entities\Transaction;
 use Doctrine\ORM\EntityManager;
 use League\Flysystem\Filesystem;
 
@@ -17,9 +18,9 @@ class TestController
 
     public function test()
     {
-        $r = $this->em->getRepository(Category::class)->findOneBy(['name' => 'NON']);
+        $c =$this->em->getRepository(Category::class)->find(212);
 
-        dd($r);
+        dd($c->getTransactions());
         die;
     }
 }

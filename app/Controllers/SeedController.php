@@ -35,7 +35,7 @@ class SeedController
 
         $user = $this->em->getRepository(User::class)->findOneBy([]);
 
-        for ($i = 0; $i < 85; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $category  = new Category();
             $category->setName(ucfirst($faker->word()));
             $category->setUser($user);
