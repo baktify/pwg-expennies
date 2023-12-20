@@ -101,17 +101,39 @@ document.addEventListener('DOMContentLoaded', function () {
         columns: [
             {data: 'description'},
             {data: 'date'},
-            // {data: 'amount'},
             {
                 data: (row) => new Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'USD'
                 }).format(row.amount)
             },
-            {data: 'user'},
             {data: 'category'},
-            {data: 'createdAt'},
-            {data: 'updatedAt'},
+            {
+                data: ({id: transactionId, receipts}) => {
+                    let icons = []
+
+                    for (const {id, name} of receipts) {
+                        const span = `
+                            <span class="position-relative">
+                                <a href="/transactions/${transactionId}/receipts/${id}" target="_blank" title="${name}">
+                                    <i class="bi bi-file-earmark-text download-receipt text-primary fs-4"></i>
+                                </a>
+                                <i class="bi bi-x-circle-fill delete-receipt text-danger"
+                                    style="position: absolute; bottom: 10px; right: -5px;"
+                                    role="button"
+                                    data-id="${id}" 
+                                    data-transactionId="${transactionId}">
+                                </i>
+                            </span>
+                        `
+                        icons = [...icons, span]
+                    }
+
+                    return icons.join('')
+                }
+            },
+            // {data: 'createdAt'},
+            // {data: 'updatedAt'},
             {
                 sortable: false,
                 data: (transaction) => `
@@ -182,7 +204,8 @@ document.addEventListener('DOMContentLoaded', function () {
             transactionId, receipts, uploadTransactionReceiptsModal._element
         ).then(({status, data}) => {
             if (status === 200) {
-                console.log(200)
+                table.draw()
+                uploadTransactionReceiptsModal.hide()
             }
         })
     })

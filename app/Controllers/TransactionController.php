@@ -76,7 +76,7 @@ class TransactionController
 
     public function getOne(Request $request, Response $response, array $args): Response
     {
-        $transaction = $this->transactionService->getOne((int)$args['id']);
+        $transaction = $this->transactionService->getById((int)$args['id']);
 
         if ($transaction) {
             return $this->responseFormatter->asJson(

@@ -45,6 +45,9 @@ class UploadReceiptsRequestValidator implements RequestValidatorInterface
             $filePath = $uploadFile->getStream()->getMetadata('uri');
             $fileContents = $uploadFile->getStream()->getContents();
 
+            // Rewinding the file pointer for future use
+            $uploadFile->getStream()->rewind();
+
             $mimeType = $detector->detectMimeType($filePath, $fileContents);
 
             if (!in_array($mimeType, $allowedMimetypes)) {

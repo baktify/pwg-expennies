@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Contracts\UserInterface;
 use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
+use App\Entities\Receipt;
 use App\Entities\Transaction;
 use App\Entities\User;
 use DateTime;
@@ -25,29 +26,25 @@ class TransactionService
     public function getPaginatedTransactions(DataTableQueryParamsData $params): Paginator
     {
         $query = $this->em->createQueryBuilder()
-            ->select('t', 'c', 'u')
+            ->select('t', 'c')
             ->from(Transaction::class, 't')
-            ->join('t.user', 'u')
             ->join('t.category', 'c')
             ->setFirstResult($params->offset)
             ->setMaxResults($params->limit);
 
-        $allowedColumns = ['description', 'date', 'amount', 'user', 'category', 'createdAt', 'updatedAt'];
+        $allowedColumns = ['description', 'date', 'amount', 'category', 'createdAt', 'updatedAt'];
         $orderBy = in_array($params->orderBy, $allowedColumns) ? $params->orderBy : 'updatedAt';
         $orderDir = $params->orderDir === 'desc' ? 'desc' : 'asc';
 
         match ($orderBy) {
-            'user' => $query->orderBy('u.name', $orderDir),
             'category' => $query->orderBy('c.name', $orderDir),
             default => $query->orderBy('t.' . $orderBy, $orderDir),
         };
 
         $searchTerm = str_replace(['%', '_'], ['\%', '\_'], $params->searchTerm);
         $query->where('t.description LIKE :description')
-            ->orWhere('u.name LIKE :userName')
             ->orWhere('c.name LIKE :categoryName')
             ->setParameter(':description', '%' . $searchTerm . '%')
-            ->setParameter(':userName', '%' . $searchTerm . '%')
             ->setParameter(':categoryName', '%' . $searchTerm . '%');
 
         return new Paginator($query);
@@ -86,8 +83,11 @@ class TransactionService
             'amount' => $transaction->getAmount(),
             'createdAt' => $transaction->getCreatedAt()->format('m/d/Y g:i A'),
             'updatedAt' => $transaction->getUpdatedAt()->format('m/d/Y g:i A'),
-            'user' => $transaction->getUser()?->getName(),
             'category' => $transaction->getCategory()?->getName(),
+            'receipts' => $transaction->getReceipts()->map(fn(Receipt $receipt) => [
+                'id' => $receipt->getId(),
+                'name' => $receipt->getFilename(),
+            ])->toArray(),
         ];
     }
 
@@ -125,7 +125,7 @@ class TransactionService
         return $structure;
     }
 
-    public function getOne(int $transactionId): ?Transaction
+    public function getById(int $transactionId): ?Transaction
     {
         return $this->em->getRepository(Transaction::class)->find($transactionId);
     }

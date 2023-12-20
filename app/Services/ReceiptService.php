@@ -8,6 +8,7 @@ use App\Entities\Receipt;
 use App\Entities\Transaction;
 use Doctrine\ORM\EntityManager;
 use League\Flysystem\Filesystem;
+use Psr\Http\Message\UploadedFileInterface;
 
 class ReceiptService
 {
@@ -34,6 +35,7 @@ class ReceiptService
 
     public function uploadFiles(Transaction $transaction, array $receipts)
     {
+        /** @var UploadedFileInterface $uploadFile */
         foreach ($receipts as $uploadFile) {
             $filename = $uploadFile->getClientFilename();
             $fileContents = $uploadFile->getStream()->getContents();
@@ -43,5 +45,10 @@ class ReceiptService
 
             $this->create($transaction, $filename, $storageFilename);
         }
+    }
+
+    public function getById(int $receiptId): ?Receipt
+    {
+        return $this->em->getRepository(Receipt::class)->find($receiptId);
     }
 }

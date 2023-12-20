@@ -47,5 +47,13 @@ return function (App $app) {
         $transactions->delete('/{id:[0-9]+}', [TransactionController::class, 'delete']);
         $transactions->put('/{id:[0-9]+}', [TransactionController::class, 'update']);
         $transactions->put('/{id:[0-9]+}/receipts', [ReceiptController::class, 'store']);
+        $transactions->get(
+            '/{transactionId:[0-9]+}/receipts/{receiptId:[0-9]+}',
+            [ReceiptController::class, 'download']
+        );
+        $transactions->delete(
+            '/{transactionId:[0-9]+}/receipts/{receiptId:[0-9]+}',
+            [ReceiptController::class, 'delete']
+        );
     })->add(AuthMiddleware::class);
 };
