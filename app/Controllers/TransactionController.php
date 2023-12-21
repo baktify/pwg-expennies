@@ -139,7 +139,7 @@ class TransactionController
         $csvFile = reset($data);
         $csvPath = $csvFile->getStream()->getMetadata('uri');
 
-        $parsedTransactionRecords = $this->csvParserService->parseFile($csvPath);
+        $parsedTransactionRecords = $this->csvParserService->parseTransactionFile($csvPath);
 
         $this->transactionService->createFromArray($parsedTransactionRecords);
 

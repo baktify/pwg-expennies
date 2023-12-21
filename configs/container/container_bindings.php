@@ -16,6 +16,9 @@ use App\Enums\StorageDriver;
 use App\RequestValidators\RequestValidatorFactory;
 use App\Services\UserProviderService;
 use App\Session;
+use Clockwork\Clockwork;
+use Clockwork\DataSource\DoctrineDataSource;
+use Clockwork\Storage\FileStorage;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
@@ -110,5 +113,12 @@ return [
         };
 
         return new Filesystem($adapter);
+    },
+    Clockwork::class => function(EntityManager $em) {
+        $clockwork = new Clockwork();
+        $clockwork->setStorage(new FileStorage(STORAGE_PATH . '/clockwork'));
+        $clockwork->addDataSource(new DoctrineDataSource($em));
+
+        return $clockwork;
     },
 ];

@@ -11,7 +11,7 @@ use League\Csv\Statement;
 
 class CsvFileService
 {
-    public function parseFile(string $csvPath): array
+    public function parseTransactionFile(string $csvPath): array
     {
         $parsedRecords = [];
 

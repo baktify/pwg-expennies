@@ -38,6 +38,18 @@ class CategoryService
         return $this->em->getRepository(Category::class)->findAll();
     }
 
+    public function getAllKeyedNameArray()
+    {
+        $categories = $this->em->getRepository(Category::class)->findAll();
+        $categoriesMap = [];
+
+        foreach ($categories as $category) {
+            $categoriesMap[strtolower($category->getName())] = $category;
+        }
+
+        return $categoriesMap;
+    }
+
     public function delete(int $id): bool
     {
         $category = $this->em->getRepository(Category::class)->find($id);

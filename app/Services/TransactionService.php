@@ -29,9 +29,10 @@ class TransactionService
     public function getPaginatedTransactions(DataTableQueryParamsData $params): Paginator
     {
         $query = $this->em->createQueryBuilder()
-            ->select('t', 'c')
+            ->select('t', 'c', 'r')
             ->from(Transaction::class, 't')
             ->leftJoin('t.category', 'c')
+            ->leftJoin('t.receipts', 'r')
             ->setFirstResult($params->offset)
             ->setMaxResults($params->limit);
 
@@ -172,6 +173,7 @@ class TransactionService
         try {
             $this->em->wrapInTransaction(function (EntityManager $em) use ($records) {
                 $user = $this->auth->user();
+//                $categories = $this->categoryService->getAllKeyedNameArray();
 
                 /** @var CsvTransactionData $record */
                 foreach ($records as $record) {
@@ -181,6 +183,7 @@ class TransactionService
                     $transaction->setAmount($record->amount);
                     $transaction->setUser($user);
 
+//                    $category = $categories[$record->category];
                     $category = $this->categoryService->getByNameOrNew($record->category, $user);
                     $transaction->setCategory($category);
 
