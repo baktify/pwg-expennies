@@ -31,7 +31,7 @@ class TransactionService
         $query = $this->em->createQueryBuilder()
             ->select('t', 'c')
             ->from(Transaction::class, 't')
-            ->join('t.category', 'c')
+            ->leftJoin('t.category', 'c')
             ->setFirstResult($params->offset)
             ->setMaxResults($params->limit);
 
@@ -188,7 +188,7 @@ class TransactionService
                 }
             });
         } catch (\Throwable $e) {
-            throw new ValidationException(['csv' => ['Something went wrong, try again later']]);
+            throw new ValidationException(['csv' => ['Something went wrong, try again later', $e->getMessage()]]);
         }
     }
 }

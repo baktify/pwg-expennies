@@ -18,13 +18,9 @@ class TestController
 
     public function test()
     {
-        $amount = '-$2,599.33';
+        $t = $this->em->getRepository(Transaction::class)->find(231);
 
-        dump($amount);
-
-        $amount = str_replace(['$', ','], [''], $amount);
-
-        dump($amount);
+        dump($t->getCategory());
 
         die;
     }

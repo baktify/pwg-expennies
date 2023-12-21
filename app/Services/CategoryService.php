@@ -57,15 +57,9 @@ class CategoryService
         return $this->em->getRepository(Category::class)->find($id);
     }
 
-    public function getByNameOrNew(string $name, UserInterface $user): ?Category
+    public function getByName(string $name): ?Category
     {
-        $category = $this->em->getRepository(Category::class)->findOneBy(['name' => $name]);
-
-        if (!$category) {
-            $category = $this->create($name, $user);
-        }
-
-        return $category;
+        return $this->em->getRepository(Category::class)->findOneBy(['name' => $name]);
     }
 
     public function update(Category $category, string $name): Category
@@ -114,5 +108,16 @@ class CategoryService
 
             return $mapper;
         };
+    }
+
+    public function getByNameOrNew(string $categoryName, UserInterface $user): ?Category
+    {
+        $category = $this->getByName($categoryName);
+
+        if (!$category && !empty($categoryName)) {
+            $category = $this->create($categoryName, $user);
+        }
+
+        return $category;
     }
 }
