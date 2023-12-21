@@ -199,7 +199,7 @@ const handleErrors = (errors, domElement) => {
     }
 }
 
-const clearErrors = (domElement) => {
+export const clearErrors = (domElement) => {
     const errorInputs = domElement.querySelectorAll('.is-invalid')
     const errorDivs = domElement.querySelectorAll('.invalid-feedback')
 

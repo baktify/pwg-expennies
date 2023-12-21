@@ -8,7 +8,8 @@ import {
     updateTransaction,
     uploadTransactionReceipts,
     deleteTransactionReceipt,
-    uploadCsvTransactions
+    uploadCsvTransactions,
+    clearErrors
 } from "./requests";
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -22,6 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const editTransactionForm = document.forms.editTransaction
     const uploadTransactionReceiptsForm = document.forms.uploadTransactionReceipts
     const uploadTransactionsFromCsvForm = document.forms.uploadTransactionsFromCsv
+    const uploadFromCsvBtn = document.querySelector('.uploadFromCsvBtn')
+    const createTransactionBtn = document.querySelector('.createTransactionBtn')
     const createTransactionCategorySelectInput = createTransactionForm.elements.categoryId
     const editTransactionCategorySelectInput = editTransactionForm.elements.categoryId
     const transactionsTable = document.getElementById('transactionsTable')
@@ -80,6 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const uploadBtn = event.target.closest('.upload-transaction-receipts-btn')
 
         if (uploadBtn) {
+            clearErrors(uploadTransactionReceiptsModal._element)
+
             const transactionId = uploadBtn.getAttribute('data-id')
             uploadTransactionReceiptsForm.querySelector('[type="submit"]').setAttribute('data-id', transactionId)
 
@@ -174,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     })
 
+    /** Click event listeners */
     transactionsTable.addEventListener('click', onClickTransactionDelete)
 
     transactionsTable.addEventListener('click', onClickTransactionEdit)
@@ -182,6 +188,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     transactionsTable.addEventListener('click', onClickTransactionReceiptDelete)
 
+    uploadFromCsvBtn.addEventListener('click', (event) => {
+        clearErrors(uploadTransactionsFromCsvModal._element)
+        uploadTransactionsFromCsvModal.show()
+    })
+
+    createTransactionBtn.addEventListener('click', (event) => {
+        clearErrors(createTransactionModal._element)
+        createTransactionModal.show()
+    })
+
+    /** Form submit event listeners */
     createTransactionForm.addEventListener('submit', (event) => {
         event.preventDefault();
 

@@ -50,13 +50,12 @@ class ReceiptController
             return $response->withStatus(404);
         }
 
-        $response = $response
-            ->withHeader('Content-Disposition', 'inline; filename="' . $receipt->getFilename() . '"')
-            ->withHeader('Content-Type', $receipt->getMediaType());
-
         $file = $this->filesystem->readStream('/receipts/' . $receipt->getStorageFilename());
 
-        return $response->withBody(new Stream($file));
+        return $response
+            ->withHeader('Content-Disposition', 'inline; filename="' . $receipt->getFilename() . '"')
+            ->withHeader('Content-Type', $receipt->getMediaType())
+            ->withBody(new Stream($file));
     }
 
     public function delete(Request $request, Response $response, array $args): Response

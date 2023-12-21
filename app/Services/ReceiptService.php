@@ -20,7 +20,7 @@ class ReceiptService
     {
     }
 
-    public function create($transaction, string $filename, string $storageFilename, string $mediaType): Receipt
+    public function create(Transaction $transaction, string $filename, string $storageFilename, string $mediaType): Receipt
     {
         $receipt = new Receipt();
         $receipt->setTransaction($transaction);
@@ -41,8 +41,8 @@ class ReceiptService
         foreach ($receipts as $uploadFile) {
             $filename = $uploadFile->getClientFilename();
             $fileContents = $uploadFile->getStream()->getContents();
-            $storageFilename = bin2hex(random_bytes(25));
             $mediaType = $uploadFile->getClientMediaType();
+            $storageFilename = bin2hex(random_bytes(25));
 
             $this->filesystem->write('receipts/' . $storageFilename, $fileContents);
 
