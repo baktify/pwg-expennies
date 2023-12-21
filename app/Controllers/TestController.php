@@ -18,9 +18,14 @@ class TestController
 
     public function test()
     {
-        $c =$this->em->getRepository(Category::class)->find(212);
+        $amount = '-$2,599.33';
 
-        dd($c->getTransactions());
+        dump($amount);
+
+        $amount = str_replace(['$', ','], [''], $amount);
+
+        dump($amount);
+
         die;
     }
 }

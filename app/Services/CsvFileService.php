@@ -13,7 +13,7 @@ class CsvFileService
 {
     public function parseFile(string $csvPath): array
     {
-        $result = [];
+        $parsedRecords = [];
 
         $csvFile = Reader::createFromPath($csvPath, 'r');
         $csvFile->setHeaderOffset(0);
@@ -37,7 +37,7 @@ class CsvFileService
                 ]);
             }
 
-            $result[] = new CsvTransactionData(
+            $parsedRecords[] = new CsvTransactionData(
                 new \DateTime($date),
                 $description,
                 $category,
@@ -45,6 +45,6 @@ class CsvFileService
             );
         }
 
-        return $result;
+        return $parsedRecords;
     }
 }

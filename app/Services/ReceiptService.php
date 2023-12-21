@@ -78,7 +78,7 @@ class ReceiptService
         return $receipt;
     }
 
-    public function delete(Receipt $receipt): bool
+    public function delete(Receipt $receipt): void
     {
         $filepath = '/receipts/' . $receipt->getStorageFilename();
         if ($this->filesystem->has($filepath)) {
@@ -87,7 +87,5 @@ class ReceiptService
 
         $this->em->remove($receipt);
         $this->em->flush();
-
-        return true;
     }
 }

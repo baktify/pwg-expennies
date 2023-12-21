@@ -47,6 +47,7 @@ class ReceiptController
         $receipt = $this->receiptService->getTransactionReceipt($args);
 
         if (!$receipt) {
+            $response->getBody()->write('Transaction or receipt not found');
             return $response->withStatus(404);
         }
 
@@ -67,11 +68,7 @@ class ReceiptController
             return $response->withStatus(404);
         }
 
-        if (!$this->receiptService->delete($receipt)) {
-            $response->getBody()->write('Something went wrong');
-
-            return $response->withStatus(500);
-        }
+        $this->receiptService->delete($receipt);
 
         $response->getBody()->write('Receipt deleted.');
 
