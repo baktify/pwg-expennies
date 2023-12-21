@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Config;
+use App\Enums\AppEnvironment;
 use App\Middlewares\CsrfFieldsMiddleware;
 use App\Middlewares\SessionStartMiddleware;
 use App\Middlewares\TwigValidationErrorsMiddleware;
@@ -16,6 +18,7 @@ use Clockwork\Clockwork;
 
 return function (App $app) {
     $container = $app->getContainer();
+    $config = $container->get(Config::class);
 
     $app->add(MethodOverrideMiddleware::class);
 
@@ -33,7 +36,9 @@ return function (App $app) {
 
     $app->add(SessionStartMiddleware::class);
 
-    $app->add(new ClockworkMiddleware($app, $container->get(Clockwork::class)));
+    if (AppEnvironment::isDevelopment($config->get('app_environment'))) {
+        $app->add(new ClockworkMiddleware($app, $container->get(Clockwork::class)));
+    }
 
     $app->addBodyParsingMiddleware();
 
