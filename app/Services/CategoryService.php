@@ -28,7 +28,6 @@ class CategoryService
         $category->setUser($user);
 
         $this->em->persist($category);
-        $this->em->flush();
 
         return $category;
     }
@@ -40,7 +39,7 @@ class CategoryService
 
     public function getAllKeyedNameArray()
     {
-        $categories = $this->em->getRepository(Category::class)->findAll();
+        $categories = $this->getAll();
         $categoriesMap = [];
 
         foreach ($categories as $category) {

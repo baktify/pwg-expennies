@@ -36,7 +36,7 @@ class Category
     #[ManyToOne(inversedBy: 'categories')]
     private User $user;
 
-    #[OneToMany(mappedBy: 'category', targetEntity: Transaction::class, cascade: ['persist', 'remove'])]
+    #[OneToMany(mappedBy: 'category', targetEntity: Transaction::class)]
     private Collection $transactions;
 
     public function __construct()

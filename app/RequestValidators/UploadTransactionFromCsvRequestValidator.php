@@ -23,7 +23,7 @@ class UploadTransactionFromCsvRequestValidator implements RequestValidatorInterf
             throw new ValidationException(['csv' => ['Could not upload a file, try again']]);
         }
 
-        if ($csvFile->getSize() > 5 * 1024 * 1024) {
+        if ($csvFile->getSize() > 7 * 1024 * 1024) {
             throw new ValidationException(['csv' => ['Maximum file size is 5Mb']]);
         }
 

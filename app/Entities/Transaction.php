@@ -40,7 +40,7 @@ class Transaction
     #[ManyToOne(inversedBy: 'transactions')]
     private ?Category $category;
 
-    #[OneToMany(mappedBy: 'transaction', targetEntity: Receipt::class, cascade: ['persist', 'remove'])]
+    #[OneToMany(mappedBy: 'transaction', targetEntity: Receipt::class)]
     private Collection $receipts;
 
     public function __construct()
@@ -93,7 +93,7 @@ class Transaction
 
     public function setUser(User $user): Transaction
     {
-        $user->addTransaction($this);
+//        $user->addTransaction($this);
 
         $this->user = $user;
 
@@ -107,7 +107,7 @@ class Transaction
 
     public function setCategory(?Category $category): Transaction
     {
-        $category?->addTransaction($this);
+//        $category?->addTransaction($this);
 
         $this->category = $category;
 

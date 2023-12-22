@@ -130,7 +130,7 @@ class TransactionController
 
     public function uploadFromCsv(Request $request, Response $response): Response
     {
-        $uploadedFiles = $request->getUploadedFiles();
+        $request->getUploadedFiles();
 
         $data = $this->requestValidatorFactory->make(UploadTransactionFromCsvRequestValidator::class)->validate(
              $request->getUploadedFiles()
