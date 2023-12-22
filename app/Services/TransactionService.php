@@ -179,7 +179,7 @@ class TransactionService
 
             $this->em->wrapInTransaction(function (EntityManager $em) use ($records) {
                 $user = $this->auth->user();
-                $databaseCategories = $this->categoryService->getAllKeyedNameArray();
+                $databaseCategories = $this->categoryService->getAllKeyedWithNameArray();
 
                 $queuedCategories = [];
 

@@ -37,7 +37,7 @@ class CategoryService
         return $this->em->getRepository(Category::class)->findAll();
     }
 
-    public function getAllKeyedNameArray()
+    public function getAllKeyedWithNameArray()
     {
         $categories = $this->getAll();
         $categoriesMap = [];
