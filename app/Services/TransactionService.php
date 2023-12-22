@@ -221,12 +221,14 @@ class TransactionService
                         $count++;
                     }
                 }
+                $em->flush();
                 $em->clear();
             });
 
             $this->clockwork->log(LogLevel::DEBUG, 'Memory usage after: ' . memory_get_usage());
             $this->clockwork->log(LogLevel::DEBUG, 'UoW after: ' . $this->em->getUnitOfWork()->size());
         } catch (\Throwable $e) {
+            // TODO: Delete the $e->getMessage() later
             throw new ValidationException(['csv' => ['Something went wrong, try again later', $e->getMessage()]]);
         }
     }
