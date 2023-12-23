@@ -6,9 +6,9 @@ namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\RequestValidators\UploadReceiptsRequestValidator;
+use App\Services\FilesystemService;
 use App\Services\ReceiptService;
 use App\Services\TransactionService;
-use League\Flysystem\Filesystem;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Psr7\Stream;
@@ -19,7 +19,7 @@ class ReceiptController
         private readonly ReceiptService                   $receiptService,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly TransactionService               $transactionService,
-        private readonly Filesystem                       $filesystem,
+        private readonly FilesystemService                $filesystemService,
     )
     {
     }
@@ -31,27 +31,37 @@ class ReceiptController
             return $response->withStatus(404);
         }
 
-        $receipts = $this->requestValidatorFactory->make(UploadReceiptsRequestValidator::class)->validate(
-            $request->getUploadedFiles()['receipts'] ?? []
+        $receiptFiles = $this->requestValidatorFactory->make(UploadReceiptsRequestValidator::class)->validate(
+            $request->getUploadedFiles()['receipts'] ?? null
         );
 
-        $this->receiptService->uploadFiles($transaction, $receipts);
+        $this->filesystemService->uploadTransactionReceiptFiles($transaction, $receiptFiles);
 
         $response->getBody()->write('Receipts uploaded');
-
         return $response;
     }
 
     public function download(Request $request, Response $response, array $args): Response
     {
-        $receipt = $this->receiptService->getTransactionReceipt($args);
+        $transactionId = (int)$args['transactionId'];
+        $receiptId = (int)$args['receiptId'];
 
-        if (!$receipt) {
+        if (!$transactionId || !$this->transactionService->getById($transactionId)) {
             $response->getBody()->write('Transaction or receipt not found');
             return $response->withStatus(404);
         }
 
-        $file = $this->filesystem->readStream('/receipts/' . $receipt->getStorageFilename());
+        if (!$receiptId || !($receipt = $this->receiptService->getById($receiptId))) {
+            $response->getBody()->write('Transaction or receipt not found');
+            return $response->withStatus(404);
+        }
+
+        if ($receipt->getTransaction()->getId() !== $transactionId) {
+            $response->getBody()->write('Transaction or receipt not found');
+            return $response->withStatus(404);
+        }
+
+        $file = $this->filesystemService->readStream('/receipts/' . $receipt->getStorageFilename());
 
         return $response
             ->withHeader('Content-Disposition', 'inline; filename="' . $receipt->getFilename() . '"')
@@ -61,14 +71,27 @@ class ReceiptController
 
     public function delete(Request $request, Response $response, array $args): Response
     {
-        $receipt = $this->receiptService->getTransactionReceipt($args);
+        $transactionId = (int)$args['transactionId'];
+        $receiptId = (int)$args['receiptId'];
 
-        if (!$receipt) {
+        if (!$transactionId || !$this->transactionService->getById($transactionId)) {
             $response->getBody()->write('Transaction or receipt not found');
             return $response->withStatus(404);
         }
 
+        if (!$receiptId || !($receipt = $this->receiptService->getById($receiptId))) {
+            $response->getBody()->write('Transaction or receipt not found');
+            return $response->withStatus(404);
+        }
+
+        if ($receipt->getTransaction()->getId() !== $transactionId) {
+            $response->getBody()->write('Transaction or receipt not found');
+            return $response->withStatus(404);
+        }
+
+        $this->filesystemService->remove('/receipts/' . $receipt->getStorageFilename());
         $this->receiptService->delete($receipt);
+        $this->receiptService->flush();
 
         $response->getBody()->write('Receipt deleted.');
 

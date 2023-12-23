@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use App\Controllers\AuthController;
 use App\Controllers\CategoryController;
@@ -29,7 +29,7 @@ return function (App $app) {
 
     $app->post('/logout', [AuthController::class, 'logOut'])->add(AuthMiddleware::class);
 
-    $app->group('/categories', function(RouteCollectorProxy $categories){
+    $app->group('/categories', function (RouteCollectorProxy $categories) {
         $categories->get('', [CategoryController::class, 'index']);
         $categories->get('/list', [CategoryController::class, 'list']);
         $categories->get('/load', [CategoryController::class, 'load']);
@@ -43,18 +43,17 @@ return function (App $app) {
         $transactions->get('', [TransactionController::class, 'index']);
         $transactions->get('/load', [TransactionController::class, 'load']);
         $transactions->post('', [TransactionController::class, 'store']);
+        $transactions->post('/upload-from-csv', [TransactionController::class, 'uploadFromCsv']);
         $transactions->get('/{id:[0-9]+}', [TransactionController::class, 'getOne']);
         $transactions->delete('/{id:[0-9]+}', [TransactionController::class, 'delete']);
         $transactions->put('/{id:[0-9]+}', [TransactionController::class, 'update']);
+        $transactions->put('/{id:[0-9]+}/toggle-review', [TransactionController::class, 'toggleReview']);
         $transactions->put('/{id:[0-9]+}/receipts', [ReceiptController::class, 'store']);
         $transactions->get(
-            '/{transactionId:[0-9]+}/receipts/{receiptId:[0-9]+}',
-            [ReceiptController::class, 'download']
+            '/{transactionId:[0-9]+}/receipts/{receiptId:[0-9]+}', [ReceiptController::class, 'download']
         );
         $transactions->delete(
-            '/{transactionId:[0-9]+}/receipts/{receiptId:[0-9]+}',
-            [ReceiptController::class, 'delete']
+            '/{transactionId:[0-9]+}/receipts/{receiptId:[0-9]+}', [ReceiptController::class, 'delete']
         );
-        $transactions->post('/upload-from-csv', [TransactionController::class, 'uploadFromCsv']);
     })->add(AuthMiddleware::class);
 };

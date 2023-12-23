@@ -6,12 +6,12 @@ use App\Contracts\RequestValidatorInterface;
 use App\Entities\Category;
 use App\Entities\Transaction;
 use App\Exceptions\ValidationException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Valitron\Validator;
 
 class TransactionUpdateRequestValidator implements RequestValidatorInterface
 {
-    public function __construct(private readonly EntityManager $em)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
     }
 

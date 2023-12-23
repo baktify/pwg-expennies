@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entities;
 
 use App\Entities\Traits\HasTimestamps;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -25,11 +26,14 @@ class Transaction
     #[Id, GeneratedValue, Column(options: ['unsigned' => true])]
     private int $id;
 
+    #[Column(name: 'is_reviewed', options: ['default' => '0'])]
+    private bool $isReviewed;
+
     #[Column]
     private string $description;
 
     #[Column]
-    private \DateTime $date;
+    private DateTime $date;
 
     #[Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private float $amount;
@@ -64,12 +68,12 @@ class Transaction
         return $this;
     }
 
-    public function getDate(): \DateTime
+    public function getDate(): DateTime
     {
         return $this->date;
     }
 
-    public function setDate(\DateTime $date): Transaction
+    public function setDate(DateTime $date): Transaction
     {
         $this->date = $date;
         return $this;
@@ -123,6 +127,17 @@ class Transaction
     {
         $this->receipts->add($receipt);
 
+        return $this;
+    }
+
+    public function isReviewed(): bool
+    {
+        return $this->isReviewed;
+    }
+
+    public function setReviewed(bool $isReviewed): Transaction
+    {
+        $this->isReviewed = $isReviewed;
         return $this;
     }
 }

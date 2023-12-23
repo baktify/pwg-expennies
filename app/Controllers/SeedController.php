@@ -6,7 +6,7 @@ use App\Contracts\UserProviderServiceInterface;
 use App\DataObjects\UserRegisterData;
 use App\Entities\Category;
 use App\Entities\User;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Faker\Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,7 +14,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class SeedController
 {
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private readonly UserProviderServiceInterface $userProviderService
     )
     {

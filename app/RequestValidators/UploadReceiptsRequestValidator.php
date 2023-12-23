@@ -10,9 +10,9 @@ use Psr\Http\Message\UploadedFileInterface;
 class UploadReceiptsRequestValidator implements RequestValidatorInterface
 {
 
-    public function validate(array $data): array
+    public function validate(?array $data): array
     {
-        if (!count($data)) {
+        if (!$data) {
             throw new ValidationException(['receipts' => ['Please, select receipt files']]);
         }
 

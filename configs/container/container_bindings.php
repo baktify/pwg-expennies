@@ -21,6 +21,7 @@ use Clockwork\DataSource\DoctrineDataSource;
 use Clockwork\Storage\FileStorage;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMSetup;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -55,7 +56,7 @@ return [
 
     Config::class => new Config(require CONFIG_PATH . '/app.php'),
 
-    EntityManager::class => function (Config $config) {
+    EntityManagerInterface::class => function (Config $config) {
         $connection = DriverManager::getConnection($config->get('doctrine.connection'));
         $ORMConfig = ORMSetup::createAttributeMetadataConfiguration(
             $config->get('doctrine.entity_dir'),
@@ -114,7 +115,7 @@ return [
 
         return new Filesystem($adapter);
     },
-    Clockwork::class => function(EntityManager $em) {
+    Clockwork::class => function(EntityManagerInterface $em) {
         $clockwork = new Clockwork();
         $clockwork->setStorage(new FileStorage(STORAGE_PATH . '/clockwork'));
         $clockwork->addDataSource(new DoctrineDataSource($em));

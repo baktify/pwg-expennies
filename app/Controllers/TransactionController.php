@@ -14,6 +14,7 @@ use App\ResponseFormatter;
 use App\Services\CategoryService;
 use App\Services\CsvFileService;
 use App\Services\RequestService;
+use App\Services\TransactionImportService;
 use App\Services\TransactionService;
 use League\Csv\Reader;
 use League\Csv\Statement;
@@ -28,6 +29,7 @@ class TransactionController
         private readonly Twig                             $twig,
         private readonly RequestService                   $requestService,
         private readonly TransactionService               $transactionService,
+        private readonly TransactionImportService               $transactionImportService,
         private readonly ResponseFormatter                $responseFormatter,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly CategoryService                  $categoryService,
@@ -47,7 +49,6 @@ class TransactionController
 
         $transactions = $this->transactionService->getPaginatedTransactions($params);
         $totalTransactions = count($transactions);
-
         $mapper = $this->transactionService->getDataTableMapper();
 
         return $this->responseFormatter->asDataTable(
@@ -103,12 +104,33 @@ class TransactionController
             $request->getParsedBody()
         );
 
-        $transaction = $this->transactionService->update((int)$args['id'], $data);
+        $category = $data['categoryId']
+            ? $this->categoryService->getById((int)$data['categoryId'])
+            : null;
+
+        $transaction = $this->transactionService->update((int)$args['id'], $data, $category);
+        $this->transactionService->flush();
 
         return $this->responseFormatter->asJson(
             $response,
             ['message' => 'Update success']
         );
+    }
+
+    public function toggleReview(Request $request, Response $response, array $args): Response
+    {
+        $transaction = $this->transactionService->getById((int) $args['id']);
+
+        if (!$transaction) {
+            $response->getBody()->write('Transaction not found');
+            return $response->withStatus(404);
+        }
+
+        $this->transactionService->toggleReview($transaction);
+        $this->transactionService->flush();
+
+        $response->getBody()->write('Review was toggled');
+        return $response;
     }
 
     public function delete(Request $request, Response $response, array $args): Response
@@ -122,6 +144,8 @@ class TransactionController
             );
         }
 
+        $this->transactionService->flush();
+
         return $this->responseFormatter->asJson(
             $response,
             ['message' => 'Transaction deleted']
@@ -131,7 +155,7 @@ class TransactionController
     public function uploadFromCsv(Request $request, Response $response): Response
     {
         $data = $this->requestValidatorFactory->make(UploadTransactionFromCsvRequestValidator::class)->validate(
-             $request->getUploadedFiles()
+            $request->getUploadedFiles()
         );
 
         $csvFile = reset($data);
@@ -139,7 +163,7 @@ class TransactionController
 
         $parsedTransactionRecords = $this->csvParserService->parseTransactionFile($csvPath);
 
-        $this->transactionService->createFromArray($parsedTransactionRecords);
+        $this->transactionImportService->import($parsedTransactionRecords);
 
         return $this->responseFormatter->asJson($response, [
             'message' => 'Success',

@@ -9,7 +9,8 @@ import {
     uploadTransactionReceipts,
     deleteTransactionReceipt,
     uploadCsvTransactions,
-    clearErrors
+    clearErrors,
+    toggleTransactionReview
 } from "./requests";
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -109,6 +110,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    const onClickTransactionReviewToggle = (event) => {
+        const toggleBtn = event.target.closest('.toggle-reviewed-btn')
+
+        if (toggleBtn) {
+            const transactionId = toggleBtn.getAttribute('data-id')
+
+            toggleTransactionReview(transactionId).then(({status, data}) => {
+                if (status === 200) {
+                    table.draw()
+                }
+            })
+        }
+    }
+
     /** Getting categories on page load */
     getCategories().then(({status, data}) => {
         if (status === 200) {
@@ -124,9 +139,17 @@ document.addEventListener('DOMContentLoaded', function () {
         serverSide: true,
         ajax: '/transactions/load',
         orderMulti: false,
+        rowCallback: (row, data) => {
+            if (!data.isReviewed) {
+                row.classList.add('fw-bold')
+            }
+
+            return row
+        },
         columns: [
             {data: 'description'},
             {data: 'date'},
+            // Amount
             {
                 data: (row) => new Intl.NumberFormat('en-US', {
                     style: 'currency',
@@ -134,6 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).format(row.amount)
             },
             {data: 'category'},
+            // Receipts
             {
                 data: ({id: transactionId, receipts}) => {
                     let icons = []
@@ -158,21 +182,35 @@ document.addEventListener('DOMContentLoaded', function () {
                     return icons.join('')
                 }
             },
-            // {data: 'createdAt'},
-            // {data: 'updatedAt'},
+            // Action
             {
                 sortable: false,
                 data: (transaction) => `
-                    <div class="d-flex">
-                        <button class="ms-2 btn btn-outline-primary delete-transaction-btn" data-id="${transaction.id}">
-                            <i class="bi bi-trash3-fill"></i>
-                        </button>
-                        <button class="ms-2 btn btn-outline-primary edit-transaction-btn" data-id="${transaction.id}">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="ms-2 btn btn-outline-primary upload-transaction-receipts-btn" data-id="${transaction.id}">
-                            <i class="bi bi-upload"></i>
-                        </button>
+                    <div class="d-flex gap-2">
+                        <div class="x">
+                            <i class="bi ${transaction.isReviewed ? 'bi-check-circle-fill text-success' : 'bi-check-circle'} toggle-reviewed-btn fs-4" 
+                                role="button" data-id="${transaction.id}"></i>
+                        </div>
+                        <div class="dropdown">
+                            <i class="bi bi-gear fs-4" role="button" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu">
+                                <li class="upload-transaction-receipts-btn">
+                                    <a class="dropdown-item open-receipt-upload-btn" href="#" data-id="${transaction.id}">
+                                        <i class="bi bi-upload"></i> Upload Receipt
+                                    </a>
+                                </li>
+                                <li class="edit-transaction-btn">
+                                    <a class="dropdown-item edit-transaction-btn" href="#" data-id="${transaction.id}">
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </a>
+                                </li>
+                                <li class="delete-transaction-btn">
+                                    <a class="dropdown-item delete-transaction-btn" href="#" data-id="${transaction.id}">
+                                        <i class="bi bi-trash3-fill"></i> Delete
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 `
             }
@@ -187,6 +225,8 @@ document.addEventListener('DOMContentLoaded', function () {
     transactionsTable.addEventListener('click', onClickTransactionReceiptsUpload)
 
     transactionsTable.addEventListener('click', onClickTransactionReceiptDelete)
+
+    transactionsTable.addEventListener('click', onClickTransactionReviewToggle)
 
     uploadFromCsvBtn.addEventListener('click', (event) => {
         clearErrors(uploadTransactionsFromCsvModal._element)

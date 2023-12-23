@@ -41,12 +41,13 @@ class CategoryController
         );
 
         $category = $this->categoryService->create($data['name'], $request->getAttribute('user'));
+        $this->categoryService->flush();
 
         return $this->responseFormatter->asJson(
             $response,
             [
                 'id' => $category->getId(),
-                'name' => $category->getName(),
+                'name' => $category?->getName(),
             ]
         );
     }
@@ -56,6 +57,8 @@ class CategoryController
         if(!$this->categoryService->delete((int)$args['id'])) {
             return $response->withStatus(404);
         }
+
+        $this->categoryService->flush();
 
         return $response;
     }
@@ -90,6 +93,7 @@ class CategoryController
         );
 
         $category = $this->categoryService->update($category, $data['name']);
+        $this->categoryService->flush();
 
         return $this->responseFormatter->asJson($response, [
             'id' => $category->getId(),

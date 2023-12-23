@@ -12,18 +12,11 @@ use App\Entities\User;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class CategoryService
+class CategoryService extends EntityManagerService
 {
-    public function __construct(
-        private readonly EntityManager $em,
-    )
-    {
-    }
-
     public function create(string $name, UserInterface $user): Category
     {
         $category = new Category();
-
         $category->setName($name);
         $category->setUser($user);
 
@@ -58,7 +51,6 @@ class CategoryService
         }
 
         $this->em->remove($category);
-        $this->em->flush();
 
         return true;
     }
@@ -76,8 +68,6 @@ class CategoryService
     public function update(Category $category, string $name): Category
     {
         $category->setName($name);
-
-        $this->em->flush();
 
         return $category;
     }
