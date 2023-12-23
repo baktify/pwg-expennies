@@ -17,6 +17,7 @@ class TransactionImportService
         private readonly AuthInterface          $auth,
         private readonly Clockwork              $clockwork,
         private readonly EntityManagerInterface $em,
+        private readonly EntityManagerService   $entityManagerService,
     )
     {
     }
@@ -65,7 +66,7 @@ class TransactionImportService
                         $count = 1;
 
                         $em->flush();
-                        $em->clear(Transaction::class);
+                        $this->entityManagerService->clear(Transaction::class);
                     } else {
                         $count++;
                     }
@@ -77,7 +78,7 @@ class TransactionImportService
             $this->clockwork->log(LogLevel::DEBUG, 'Memory usage after: ' . memory_get_usage());
             $this->clockwork->log(LogLevel::DEBUG, 'UoW after: ' . $this->em->getUnitOfWork()->size());
         } catch (\Throwable $e) {
-            throw new ValidationException(['csv' => ['Something went wrong, try again later']]);
+            throw new ValidationException(['csv' => ['Something went wrong, try again later', $e->getMessage()]]);
         }
     }
 }

@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
+use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\Table;
 
 #[Entity, Table('transactions'), HasLifecycleCallbacks]
@@ -26,7 +27,7 @@ class Transaction
     #[Id, GeneratedValue, Column(options: ['unsigned' => true])]
     private int $id;
 
-    #[Column(name: 'is_reviewed', options: ['default' => '0'])]
+    #[Column(name: 'is_reviewed', options: ['default' => false])]
     private bool $isReviewed;
 
     #[Column]
@@ -50,6 +51,14 @@ class Transaction
     public function __construct()
     {
         $this->receipts = new ArrayCollection();
+    }
+
+    #[PrePersist]
+    public function assignIsReviewed()
+    {
+        if (!isset($this->isReviewed)) {
+            $this->setReviewed(false);
+        }
     }
 
     public function getId(): int
@@ -130,14 +139,16 @@ class Transaction
         return $this;
     }
 
+
     public function isReviewed(): bool
     {
         return $this->isReviewed;
     }
 
-    public function setReviewed(bool $isReviewed): Transaction
+    public function setReviewed(?bool $isReviewed = false): Transaction
     {
         $this->isReviewed = $isReviewed;
         return $this;
     }
+
 }

@@ -21,11 +21,11 @@ class TestController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly Filesystem $filesystem,
-        private readonly Clockwork $clockwork,
-        private readonly CategoryService $categoryService,
-        private readonly TransactionService $transactionService,
-        private readonly AuthInterface $auth,
+        private readonly Filesystem             $filesystem,
+        private readonly Clockwork              $clockwork,
+        private readonly CategoryService        $categoryService,
+        private readonly TransactionService     $transactionService,
+        private readonly AuthInterface          $auth,
     )
     {
     }
@@ -34,19 +34,11 @@ class TestController
     {
         $user = $this->auth->user();
 
-        $c = new Category();
-        $c->setUser($user);
-        $c->setName('X');
-        $this->em->persist($c);
+        $transaction = $this->transactionService->create(
+            'z', 10.5, new \DateTime(), $user
+        );
 
-        $t = new Transaction();
-        $t->setDescription('Z');
-        $t->setAmount(10.5);
-        $t->setDate(new \DateTime());
-        $t->setUser($user);
-        $t->setCategory($c);
-
-        $this->em->persist($user);
+        $this->em->persist($transaction);
 
         $this->em->flush();
 

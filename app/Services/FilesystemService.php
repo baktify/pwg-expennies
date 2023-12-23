@@ -23,9 +23,9 @@ class FilesystemService
         /** @var UploadedFileInterface $uploadFile */
         foreach ($receiptFiles as $uploadFile) {
             $filename = $uploadFile->getClientFilename();
+            $storageFilename = bin2hex(random_bytes(25));
             $fileContents = $uploadFile->getStream()->getContents();
             $mediaType = $uploadFile->getClientMediaType();
-            $storageFilename = bin2hex(random_bytes(25));
 
             $this->filesystem->write('receipts/' . $storageFilename, $fileContents);
 
