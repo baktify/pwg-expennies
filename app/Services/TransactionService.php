@@ -137,8 +137,6 @@ class TransactionService
 
         $transaction->setCategory($category);
 
-        $this->entityManager->persist($transaction);
-
         return $transaction;
     }
 
