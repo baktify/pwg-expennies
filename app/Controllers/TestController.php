@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Contracts\AuthInterface;
 use App\Contracts\EntityManagerServiceInterface;
 use App\Entities\Category;
+use App\Entities\Receipt;
 use App\Entities\Transaction;
 use App\Services\CategoryService;
 use App\Services\TransactionService;
@@ -14,6 +15,7 @@ use Clockwork\DataSource\DoctrineDataSource;
 use Clockwork\Request\LogLevel;
 use Clockwork\Storage\FileStorage;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ManyToOne;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -33,8 +35,18 @@ class TestController
 
     public function test(Request $request, Response $response): Response
     {
-        $this->entityManager->sync();
+        $x = new \ReflectionMethod(TestController::class, 'foo');
+        $y = new \ReflectionFunction(function() {
+
+        });
+        dd($x, $y);
 
         return $response;
+    }
+
+    #[ManyToOne(targetEntity: Receipt::class)]
+    public function foo(string $firstname, int $age): string
+    {
+
     }
 }

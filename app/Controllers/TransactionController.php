@@ -8,7 +8,6 @@ use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Entities\Transaction;
 use App\RequestValidators\TransactionCreateRequestValidator;
-use App\RequestValidators\TransactionGetRequestValidator;
 use App\RequestValidators\TransactionUpdateRequestValidator;
 use App\RequestValidators\UploadTransactionFromCsvRequestValidator;
 use App\ResponseFormatter;
@@ -17,11 +16,8 @@ use App\Services\CsvFileService;
 use App\Services\RequestService;
 use App\Services\TransactionImportService;
 use App\Services\TransactionService;
-use League\Csv\Reader;
-use League\Csv\Statement;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\UploadedFileInterface;
 use Slim\Views\Twig;
 
 class TransactionController
@@ -40,7 +36,7 @@ class TransactionController
     {
     }
 
-    public function index(Request $request, Response $response): Response
+    public function index(Response $response): Response
     {
         return $this->twig->render($response, 'transactions/index.twig');
     }
@@ -84,24 +80,15 @@ class TransactionController
         );
     }
 
-    public function getOne(Request $request, Response $response, array $args): Response
+    public function get(Response $response, Transaction $transaction): Response
     {
-        $transaction = $this->transactionService->getById((int)$args['id']);
-
-        if (!$transaction) {
-            return $this->responseFormatter->asJson(
-                $response->withStatus(404),
-                ['message' => 'Transaction not found']
-            );
-        }
-
         return $this->responseFormatter->asJson(
             $response,
             $this->transactionService->toArray($transaction, false)
         );
     }
 
-    public function update(Request $request, Response $response, array $args): Response
+    public function update(Request $request, Response $response, Transaction $transaction): Response
     {
         $data = $this->requestValidatorFactory->make(TransactionUpdateRequestValidator::class)->validate(
             $request->getParsedBody()
@@ -111,7 +98,7 @@ class TransactionController
             ? $this->categoryService->getById((int)$data['categoryId'])
             : null;
 
-        $transaction = $this->transactionService->update((int)$args['id'], $data, $category);
+        $this->transactionService->update($transaction, $data, $category);
         $this->entityManager->sync($transaction);
 
         return $this->responseFormatter->asJson(
@@ -120,15 +107,8 @@ class TransactionController
         );
     }
 
-    public function toggleReview(Request $request, Response $response, array $args): Response
+    public function toggleReview(Response $response, Transaction $transaction): Response
     {
-        $transaction = $this->transactionService->getById((int)$args['id']);
-
-        if (!$transaction) {
-            $response->getBody()->write('Transaction not found');
-            return $response->withStatus(404);
-        }
-
         $this->transactionService->toggleReview($transaction);
         $this->entityManager->sync();
 
@@ -136,17 +116,8 @@ class TransactionController
         return $response;
     }
 
-    public function delete(Request $request, Response $response, array $args): Response
+    public function delete(Response $response, Transaction $transaction): Response
     {
-        $transaction = $this->transactionService->getById((int)$args['id']);
-
-        if (!$transaction) {
-            return $this->responseFormatter->asJson(
-                $response->withStatus(404),
-                ['message' => 'Transaction not found']
-            );
-        }
-
         $this->entityManager->delete($transaction, true);
 
         return $this->responseFormatter->asJson(

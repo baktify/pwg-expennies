@@ -10,12 +10,16 @@ const axe = axios.create({
 
 /** Transaction requests */
 export const toggleTransactionReview = async (transactionId) => {
-    const {status, data} = await axe.put(`/transactions/${transactionId}/toggle-review`, {
-        ...getCsrfFields(),
-        _METHOD: 'PUT'
-    })
+    try {
+        const {status, data} = await axe.put(`/transactions/${transactionId}/toggle-review`, {
+            ...getCsrfFields(),
+            _METHOD: 'PUT'
+        })
 
-    return {status, data}
+        return {status, data}
+    } catch ({response: {status, data: errors}}) {
+        return {status, errors}
+    }
 }
 
 export const uploadCsvTransactions = async (csvFile, parentDom) => {

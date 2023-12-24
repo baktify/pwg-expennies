@@ -2,19 +2,15 @@
 
 namespace App\Controllers;
 
-use App\Auth;
 use App\Contracts\AuthInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\UserRegisterData;
-use App\Entities\User;
 use App\Exceptions\ValidationException;
 use App\RequestValidators\UserLogInRequestValidator;
 use App\RequestValidators\UserRegisterRequestValidator;
-use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
-use Valitron\Validator;
 
 class AuthController
 {
@@ -26,12 +22,12 @@ class AuthController
     {
     }
 
-    public function loginView(Request $request, Response $response): Response
+    public function loginView(Response $response): Response
     {
         return $this->twig->render($response, 'auth/login.twig');
     }
 
-    public function registerView(Request $request, Response $response): Response
+    public function registerView(Response $response): Response
     {
         return $this->twig->render($response, 'auth/register.twig');
     }
@@ -62,7 +58,7 @@ class AuthController
         return $response->withHeader('Location', '/')->withStatus(302);
     }
 
-    public function logOut(Request $request, Response $response): Response
+    public function logOut(Response $response): Response
     {
         $this->auth->logOut();
 

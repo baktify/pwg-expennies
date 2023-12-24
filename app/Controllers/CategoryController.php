@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
-use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
-use App\RequestValidators\CategoryLoadRequestValidator;
 use App\RequestValidators\CategoryCreateRequestValidator;
 use App\RequestValidators\CategoryUpdateRequestValidator;
 use App\ResponseFormatter;
@@ -31,7 +29,7 @@ class CategoryController
     {
     }
 
-    public function index(Request $request, Response $response): Response
+    public function index(Response $response): Response
     {
         return $this->twig->render($response, 'categories/index.twig');
     }
@@ -54,27 +52,15 @@ class CategoryController
         );
     }
 
-    public function delete(Request $request, Response $response, array $args): Response
+    public function delete(Response $response, Category $category): Response
     {
-        $category = $this->categoryService->getById((int)$args['id']);
-
-        if (!$category) {
-            return $response->withStatus(404);
-        }
-
         $this->entityManager->delete($category, true);
 
         return $response;
     }
 
-    public function getOne(Request $request, Response $response, array $args): Response
+    public function get(Response $response, Category $category): Response
     {
-        $category = $this->categoryService->getById((int)$args['id']);
-
-        if (!$category) {
-            return $response->withStatus(404);
-        }
-
         return $this->responseFormatter->asJson(
             $response,
             [
@@ -84,14 +70,8 @@ class CategoryController
         );
     }
 
-    public function update(Request $request, Response $response, array $args): Response
+    public function update(Request $request, Response $response, Category $category): Response
     {
-        $category = $this->categoryService->getById((int)$args['id']);
-
-        if (!$category) {
-            return $response->withStatus(404);
-        }
-
         $data = $this->requestValidatorFactory->make(CategoryUpdateRequestValidator::class)->validate(
             $request->getParsedBody()
         );
@@ -122,7 +102,7 @@ class CategoryController
         );
     }
 
-    public function list(Request $request, Response $response, array $args): Response
+    public function list(Response $response, array $args): Response
     {
         $categories = $this->categoryService->getAll();
 

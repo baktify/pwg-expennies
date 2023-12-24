@@ -127,10 +127,8 @@ class TransactionService
         return $this->entityManager->getRepository(Transaction::class)->find($transactionId);
     }
 
-    public function update(int $id, array $data, ?Category $category = null): Transaction
+    public function update(Transaction $transaction, array $data, ?Category $category = null): Transaction
     {
-        $transaction = $this->entityManager->getRepository(Transaction::class)->find($id);
-
         $transaction->setDescription($data['description']);
         $transaction->setAmount((float)$data['amount']);
         $transaction->setDate(new DateTime($data['date']));

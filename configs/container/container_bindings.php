@@ -11,6 +11,7 @@ use App\Contracts\SessionInterface;
 use App\Contracts\UserProviderServiceInterface;
 use App\Csrf;
 use App\DataObjects\SessionConfig;
+use App\EntityBindingRouteStrategy;
 use App\Enums\AppEnvironment;
 use App\Enums\SameSite;
 use App\Enums\StorageDriver;
@@ -50,6 +51,11 @@ return [
         AppFactory::setContainer($container);
         $app = AppFactory::create();
 
+        $app->getRouteCollector()->setDefaultInvocationStrategy(new EntityBindingRouteStrategy(
+            $container->get(EntityManagerServiceInterface::class),
+//            $app->getResponseFactory(),
+        ));
+
         $addMiddlewares($app);
         $router($app);
 
@@ -67,7 +73,7 @@ return [
         return new EntityManager($connection, $ORMConfig);
     },
 
-    EntityManagerServiceInterface::class => function(ContainerInterface $container) {
+    EntityManagerServiceInterface::class => function (ContainerInterface $container) {
         return $container->get(EntityManagerService::class);
     },
 

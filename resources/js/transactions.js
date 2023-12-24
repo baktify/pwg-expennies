@@ -119,6 +119,8 @@ document.addEventListener('DOMContentLoaded', function () {
             toggleTransactionReview(transactionId).then(({status, data}) => {
                 if (status === 200) {
                     table.draw()
+                } else if (status === 404) {
+                    alert('Resource not found')
                 }
             })
         }
