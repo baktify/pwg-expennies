@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Contracts\AuthInterface;
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\UserInterface;
 use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
-use App\Entities\User;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class CategoryService extends EntityManagerService
+class CategoryService
 {
+    public function __construct(private readonly EntityManagerServiceInterface $entityManager)
+    {
+    }
+
     public function create(string $name, UserInterface $user): Category
     {
         $category = new Category();
         $category->setName($name);
         $category->setUser($user);
 
-        $this->em->persist($category);
-
         return $category;
     }
 
     public function getAll(): array
     {
-        return $this->em->getRepository(Category::class)->findAll();
+        return $this->entityManager->getRepository(Category::class)->findAll();
     }
 
-    public function getAllKeyedWithNameArray()
+    public function getAllKeyedWithNameArray(): array
     {
         $categories = $this->getAll();
         $categoriesMap = [];
@@ -42,27 +42,14 @@ class CategoryService extends EntityManagerService
         return $categoriesMap;
     }
 
-    public function delete(int $id): bool
-    {
-        $category = $this->em->getRepository(Category::class)->find($id);
-
-        if (!$category) {
-            return false;
-        }
-
-        $this->em->remove($category);
-
-        return true;
-    }
-
     public function getById(int $id): ?Category
     {
-        return $this->em->getRepository(Category::class)->find($id);
+        return $this->entityManager->getRepository(Category::class)->find($id);
     }
 
     public function getByName(string $name): ?Category
     {
-        return $this->em->getRepository(Category::class)->findOneBy(['name' => $name]);
+        return $this->entityManager->getRepository(Category::class)->findOneBy(['name' => $name]);
     }
 
     public function update(Category $category, string $name): Category
@@ -74,7 +61,7 @@ class CategoryService extends EntityManagerService
 
     public function getPaginatedCategories(DataTableQueryParamsData $params): Paginator
     {
-        $query = $this->em->createQueryBuilder()
+        $query = $this->entityManager->createQueryBuilder()
             ->select('c')
             ->from(Category::class, 'c')
             ->setFirstResult($params->offset)

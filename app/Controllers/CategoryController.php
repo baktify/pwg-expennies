@@ -12,6 +12,7 @@ use App\RequestValidators\CategoryCreateRequestValidator;
 use App\RequestValidators\CategoryUpdateRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
+use App\Services\EntityManagerService;
 use App\Services\RequestService;
 use Slim\Views\Twig;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -25,6 +26,7 @@ class CategoryController
         private readonly CategoryService                  $categoryService,
         private readonly ResponseFormatter                $responseFormatter,
         private readonly RequestService                   $requestService,
+        private readonly EntityManagerService             $entityManager,
     )
     {
     }
@@ -41,7 +43,7 @@ class CategoryController
         );
 
         $category = $this->categoryService->create($data['name'], $request->getAttribute('user'));
-        $this->categoryService->flush();
+        $this->entityManager->sync($category);
 
         return $this->responseFormatter->asJson(
             $response,
@@ -54,11 +56,13 @@ class CategoryController
 
     public function delete(Request $request, Response $response, array $args): Response
     {
-        if(!$this->categoryService->delete((int)$args['id'])) {
+        $category = $this->categoryService->getById((int)$args['id']);
+
+        if (!$category) {
             return $response->withStatus(404);
         }
 
-        $this->categoryService->flush();
+        $this->entityManager->delete($category, true);
 
         return $response;
     }
@@ -93,7 +97,7 @@ class CategoryController
         );
 
         $category = $this->categoryService->update($category, $data['name']);
-        $this->categoryService->flush();
+        $this->entityManager->sync($category);
 
         return $this->responseFormatter->asJson($response, [
             'id' => $category->getId(),

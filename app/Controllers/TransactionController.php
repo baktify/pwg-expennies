@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Entities\Transaction;
 use App\RequestValidators\TransactionCreateRequestValidator;
@@ -34,6 +35,7 @@ class TransactionController
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly CategoryService                  $categoryService,
         private readonly CsvFileService                   $csvParserService,
+        private readonly EntityManagerServiceInterface    $entityManager,
     )
     {
     }
@@ -74,6 +76,7 @@ class TransactionController
             $request->getAttribute('user'),
             $category,
         );
+        $this->entityManager->sync($transaction);
 
         return $this->responseFormatter->asJson(
             $response,
@@ -85,16 +88,16 @@ class TransactionController
     {
         $transaction = $this->transactionService->getById((int)$args['id']);
 
-        if ($transaction) {
+        if (!$transaction) {
             return $this->responseFormatter->asJson(
-                $response,
-                $this->transactionService->toArray($transaction, false)
+                $response->withStatus(404),
+                ['message' => 'Transaction not found']
             );
         }
 
         return $this->responseFormatter->asJson(
-            $response->withStatus(404),
-            ['message' => 'Transaction not found']
+            $response,
+            $this->transactionService->toArray($transaction, false)
         );
     }
 
@@ -109,7 +112,7 @@ class TransactionController
             : null;
 
         $transaction = $this->transactionService->update((int)$args['id'], $data, $category);
-        $this->transactionService->flush();
+        $this->entityManager->sync($transaction);
 
         return $this->responseFormatter->asJson(
             $response,
@@ -127,7 +130,7 @@ class TransactionController
         }
 
         $this->transactionService->toggleReview($transaction);
-        $this->transactionService->flush();
+        $this->entityManager->sync();
 
         $response->getBody()->write('Review was toggled');
         return $response;
@@ -135,16 +138,16 @@ class TransactionController
 
     public function delete(Request $request, Response $response, array $args): Response
     {
-        $result = $this->transactionService->delete((int)$args['id']);
+        $transaction = $this->transactionService->getById((int)$args['id']);
 
-        if (!$result) {
+        if (!$transaction) {
             return $this->responseFormatter->asJson(
                 $response->withStatus(404),
                 ['message' => 'Transaction not found']
             );
         }
 
-        $this->transactionService->flush();
+        $this->entityManager->delete($transaction, true);
 
         return $this->responseFormatter->asJson(
             $response,

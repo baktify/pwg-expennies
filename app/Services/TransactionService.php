@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\UserInterface;
 use App\DataObjects\CsvTransactionData;
 use App\DataObjects\DataTableQueryParamsData;
@@ -13,11 +14,15 @@ use App\Entities\Transaction;
 use DateTime;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class TransactionService extends EntityManagerService
+class TransactionService
 {
+    public function __construct(private readonly EntityManagerServiceInterface $entityManager)
+    {
+    }
+
     public function getPaginatedTransactions(DataTableQueryParamsData $params): Paginator
     {
-        $query = $this->em->createQueryBuilder()
+        $query = $this->entityManager->createQueryBuilder()
             ->select('t', 'c', 'r')
             ->from(Transaction::class, 't')
             ->leftJoin('t.category', 'c')
@@ -58,9 +63,6 @@ class TransactionService extends EntityManagerService
         $transaction->setUser($user);
 
         $transaction->setCategory($category);
-
-        $this->em->persist($transaction);
-        $this->em->flush();
 
         return $transaction;
     }
@@ -122,25 +124,12 @@ class TransactionService extends EntityManagerService
 
     public function getById(int $transactionId): ?Transaction
     {
-        return $this->em->getRepository(Transaction::class)->find($transactionId);
-    }
-
-    public function delete(int $transactionId): bool
-    {
-        $transaction = $this->em->getRepository(Transaction::class)->find($transactionId);
-
-        if (!$transaction) {
-            return false;
-        }
-
-        $this->em->remove($transaction);
-
-        return true;
+        return $this->entityManager->getRepository(Transaction::class)->find($transactionId);
     }
 
     public function update(int $id, array $data, ?Category $category = null): Transaction
     {
-        $transaction = $this->em->getRepository(Transaction::class)->find($id);
+        $transaction = $this->entityManager->getRepository(Transaction::class)->find($id);
 
         $transaction->setDescription($data['description']);
         $transaction->setAmount((float)$data['amount']);
@@ -148,7 +137,7 @@ class TransactionService extends EntityManagerService
 
         $transaction->setCategory($category);
 
-        $this->em->persist($transaction);
+        $this->entityManager->persist($transaction);
 
         return $transaction;
     }

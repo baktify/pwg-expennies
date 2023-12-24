@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Auth;
 use App\Config;
 use App\Contracts\AuthInterface;
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Contracts\SessionInterface;
 use App\Contracts\UserProviderServiceInterface;
@@ -14,6 +15,7 @@ use App\Enums\AppEnvironment;
 use App\Enums\SameSite;
 use App\Enums\StorageDriver;
 use App\RequestValidators\RequestValidatorFactory;
+use App\Services\EntityManagerService;
 use App\Services\UserProviderService;
 use App\Session;
 use Clockwork\Clockwork;
@@ -63,6 +65,10 @@ return [
             $config->get('doctrine.dev_mode')
         );
         return new EntityManager($connection, $ORMConfig);
+    },
+
+    EntityManagerServiceInterface::class => function(ContainerInterface $container) {
+        return $container->get(EntityManagerService::class);
     },
 
     Twig::class => function (Config $config, ContainerInterface $container) {
@@ -115,7 +121,7 @@ return [
 
         return new Filesystem($adapter);
     },
-    Clockwork::class => function(EntityManagerInterface $em) {
+    Clockwork::class => function (EntityManagerInterface $em) {
         $clockwork = new Clockwork();
         $clockwork->setStorage(new FileStorage(STORAGE_PATH . '/clockwork'));
         $clockwork->addDataSource(new DoctrineDataSource($em));

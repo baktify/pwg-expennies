@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\AuthInterface;
+use App\Contracts\EntityManagerServiceInterface;
 use App\DataObjects\CsvTransactionData;
 use App\Entities\Transaction;
 use App\Exceptions\ValidationException;
@@ -13,11 +14,10 @@ use Doctrine\ORM\EntityManagerInterface;
 class TransactionImportService
 {
     public function __construct(
-        private readonly CategoryService        $categoryService,
-        private readonly AuthInterface          $auth,
-        private readonly Clockwork              $clockwork,
-        private readonly EntityManagerInterface $em,
-        private readonly EntityManagerService   $entityManagerService,
+        private readonly CategoryService               $categoryService,
+        private readonly TransactionService            $transactionService,
+        private readonly AuthInterface                 $auth,
+        private readonly EntityManagerServiceInterface $entityManager,
     )
     {
     }
@@ -25,10 +25,7 @@ class TransactionImportService
     public function import(array $records): void
     {
         try {
-            $this->clockwork->log(LogLevel::DEBUG, 'Memory usage before: ' . memory_get_usage());
-            $this->clockwork->log(LogLevel::DEBUG, 'UoW before: ' . $this->em->getUnitOfWork()->size());
-
-            $this->em->wrapInTransaction(function (EntityManagerInterface $em) use ($records) {
+            $this->entityManager->wrapInTransaction(function (EntityManagerInterface $em) use ($records) {
                 $user = $this->auth->user();
                 $databaseCategories = $this->categoryService->getAllKeyedWithNameArray();
 
@@ -39,44 +36,44 @@ class TransactionImportService
 
                 /** @var CsvTransactionData $record */
                 foreach ($records as $record) {
-                    $transaction = new Transaction();
-                    $transaction->setDate($record->date);
-                    $transaction->setDescription($record->description);
-                    $transaction->setAmount($record->amount);
-                    $transaction->setUser($user);
-
                     $categoryFromCsv = strtolower($record->category);
-                    $category = null;
 
                     if ($databaseCategories[$categoryFromCsv] ?? null) {
                         $category = $databaseCategories[$categoryFromCsv];
                     } else if (array_key_exists($categoryFromCsv, $queuedCategories)) {
                         $category = $queuedCategories[$categoryFromCsv];
-                    } else if ($categoryFromCsv) {
+                    } else if (!empty($categoryFromCsv)) {
                         $category = $this->categoryService->create($categoryFromCsv, $user);
                         $queuedCategories[strtolower($category->getName())] = $category;
+                    } else {
+                        $category = null;
                     }
 
-                    $transaction->setCategory($category);
-                    $em->persist($transaction);
+                    $transaction = $this->transactionService->create(
+                        $record->description,
+                        $record->amount,
+                        $record->date,
+                        $user,
+                        $category
+                    );
+
+                    $this->entityManager->sync($transaction, false);
+                    $this->entityManager->sync($category, false);
 
                     unset($category);
 
                     if ($count % $batch === 0) {
                         $count = 1;
 
-                        $em->flush();
-                        $this->entityManagerService->clear(Transaction::class);
+                        $this->entityManager->sync();
+                        $this->entityManager->clear(Transaction::class);
                     } else {
                         $count++;
                     }
                 }
-                $em->flush();
-                $em->clear();
+                $this->entityManager->sync();
+                $this->entityManager->clear();
             });
-
-            $this->clockwork->log(LogLevel::DEBUG, 'Memory usage after: ' . memory_get_usage());
-            $this->clockwork->log(LogLevel::DEBUG, 'UoW after: ' . $this->em->getUnitOfWork()->size());
         } catch (\Throwable $e) {
             throw new ValidationException(['csv' => ['Something went wrong, try again later', $e->getMessage()]]);
         }

@@ -2,17 +2,46 @@
 
 namespace App\Services;
 
+use App\Contracts\EntityManagerServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use http\Exception\BadMethodCallException;
 
-class EntityManagerService
+/**
+ * @mixin EntityManagerInterface
+ */
+class EntityManagerService implements EntityManagerServiceInterface
 {
     public function __construct(protected readonly EntityManagerInterface $em)
     {
     }
 
-    public function flush(): void
+    public function __call(string $name, array $arguments)
     {
-        $this->em->flush();
+        if (method_exists($this->em, $name)) {
+            return call_user_func_array([$this->em, $name], $arguments);
+        }
+
+        throw new BadMethodCallException('Undefined call method "' . $name . '"');
+    }
+
+    public function sync($entity = null, bool $flush = true): void
+    {
+        if ($entity) {
+            $this->em->persist($entity);
+        }
+
+        if ($flush) {
+            $this->em->flush();
+        }
+    }
+
+    public function delete($entity, bool $sync = false): void
+    {
+        $this->em->remove($entity);
+
+        if ($sync) {
+            $this->sync(flush: true);
+        }
     }
 
     public function clear(?string $entityClass = null): void

@@ -194,18 +194,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="dropdown">
                             <i class="bi bi-gear fs-4" role="button" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu">
-                                <li class="upload-transaction-receipts-btn">
-                                    <a class="dropdown-item open-receipt-upload-btn" href="#" data-id="${transaction.id}">
+                                <li class="upload-transaction-receipts-btn" data-id="${transaction.id}">
+                                    <a class="dropdown-item" href="#">
                                         <i class="bi bi-upload"></i> Upload Receipt
                                     </a>
                                 </li>
-                                <li class="edit-transaction-btn">
-                                    <a class="dropdown-item edit-transaction-btn" href="#" data-id="${transaction.id}">
+                                <li class="edit-transaction-btn" data-id="${transaction.id}">
+                                    <a class="dropdown-item" href="#">
                                         <i class="bi bi-pencil-fill"></i> Edit
                                     </a>
                                 </li>
-                                <li class="delete-transaction-btn">
-                                    <a class="dropdown-item delete-transaction-btn" href="#" data-id="${transaction.id}">
+                                <li class="delete-transaction-btn" data-id="${transaction.id}">
+                                    <a class="dropdown-item" href="#">
                                         <i class="bi bi-trash3-fill"></i> Delete
                                     </a>
                                 </li>
@@ -286,6 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (status === 200) {
                 table.draw()
                 uploadTransactionReceiptsModal.hide()
+                uploadTransactionReceiptsForm.reset()
             }
         })
     })
@@ -300,6 +301,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ).then(({status, data}) => {
             if (status === 200) {
                 uploadTransactionsFromCsvModal.hide()
+                uploadTransactionsFromCsvForm.reset()
                 table.draw()
             }
         })

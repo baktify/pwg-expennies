@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Entities\Transaction;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
@@ -12,8 +13,9 @@ use Psr\Http\Message\UploadedFileInterface;
 class FilesystemService
 {
     public function __construct(
-        private readonly Filesystem     $filesystem,
-        private readonly ReceiptService $receiptService,
+        private readonly Filesystem                    $filesystem,
+        private readonly ReceiptService                $receiptService,
+        private readonly EntityManagerServiceInterface $entityManager,
     )
     {
     }
@@ -29,9 +31,9 @@ class FilesystemService
 
             $this->filesystem->write('receipts/' . $storageFilename, $fileContents);
 
-            $this->receiptService->create($transaction, $filename, $storageFilename, $mediaType);
+            $receipt = $this->receiptService->create($transaction, $filename, $storageFilename, $mediaType);
+            $this->entityManager->sync($receipt);
         }
-        $this->receiptService->flush();
     }
 
     /**

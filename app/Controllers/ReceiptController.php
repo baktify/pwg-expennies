@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\RequestValidators\UploadReceiptsRequestValidator;
 use App\Services\FilesystemService;
@@ -20,14 +21,16 @@ class ReceiptController
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly TransactionService               $transactionService,
         private readonly FilesystemService                $filesystemService,
+        private readonly EntityManagerServiceInterface    $entityManager
     )
     {
     }
 
     public function store(Request $request, Response $response, array $args): Response
     {
-        $id = (int)$args['id'];
-        if (!$id || !($transaction = $this->transactionService->getById($id))) {
+        $transaction = $this->transactionService->getById((int)$args['id']);
+
+        if (!($transaction)) {
             return $response->withStatus(404);
         }
 
@@ -74,12 +77,12 @@ class ReceiptController
         $transactionId = (int)$args['transactionId'];
         $receiptId = (int)$args['receiptId'];
 
-        if (!$transactionId || !$this->transactionService->getById($transactionId)) {
+        if (!$this->transactionService->getById($transactionId)) {
             $response->getBody()->write('Transaction or receipt not found');
             return $response->withStatus(404);
         }
 
-        if (!$receiptId || !($receipt = $this->receiptService->getById($receiptId))) {
+        if (!($receipt = $this->receiptService->getById($receiptId))) {
             $response->getBody()->write('Transaction or receipt not found');
             return $response->withStatus(404);
         }
@@ -90,8 +93,7 @@ class ReceiptController
         }
 
         $this->filesystemService->remove('/receipts/' . $receipt->getStorageFilename());
-        $this->receiptService->delete($receipt);
-        $this->receiptService->flush();
+        $this->entityManager->delete($receipt, true);
 
         $response->getBody()->write('Receipt deleted.');
 
