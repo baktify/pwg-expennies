@@ -29,7 +29,7 @@ class TransactionController
         private readonly Twig                             $twig,
         private readonly RequestService                   $requestService,
         private readonly TransactionService               $transactionService,
-        private readonly TransactionImportService               $transactionImportService,
+        private readonly TransactionImportService         $transactionImportService,
         private readonly ResponseFormatter                $responseFormatter,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly CategoryService                  $categoryService,
@@ -119,7 +119,7 @@ class TransactionController
 
     public function toggleReview(Request $request, Response $response, array $args): Response
     {
-        $transaction = $this->transactionService->getById((int) $args['id']);
+        $transaction = $this->transactionService->getById((int)$args['id']);
 
         if (!$transaction) {
             $response->getBody()->write('Transaction not found');

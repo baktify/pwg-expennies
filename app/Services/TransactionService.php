@@ -138,7 +138,7 @@ class TransactionService extends EntityManagerService
         return true;
     }
 
-    public function update(int $id, array $data, ?Category $category): Transaction
+    public function update(int $id, array $data, ?Category $category = null): Transaction
     {
         $transaction = $this->em->getRepository(Transaction::class)->find($id);
 
