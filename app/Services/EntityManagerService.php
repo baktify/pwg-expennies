@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\EntityManagerServiceInterface;
+use App\Contracts\UserInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use http\Exception\BadMethodCallException;
 
@@ -58,5 +59,10 @@ class EntityManagerService implements EntityManagerServiceInterface
         foreach ($entities as $entity) {
             $this->em->detach($entity);
         }
+    }
+
+    public function enableAuthenticatedUserFilter(int $userId): void
+    {
+        $this->getFilters()->enable('user')->setParameter('user_id', $userId);
     }
 }

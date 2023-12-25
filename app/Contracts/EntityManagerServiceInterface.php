@@ -14,4 +14,6 @@ interface EntityManagerServiceInterface
     public function delete($entity, bool $sync = false): void;
 
     public function clear(?string $entityClass = null): void;
+
+    public function enableAuthenticatedUserFilter(int $userId): void;
 }

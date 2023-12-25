@@ -30,7 +30,7 @@ class AuthMiddleware implements MiddlewareInterface
                 'id' => $user->getId(),
             ]);
 
-            $this->entityManagerService->getFilters()->enable('user')->setParameter('user_id', $user->getId());
+            $this->entityManagerService->enableAuthenticatedUserFilter($user->getId());
 
             return $handler->handle($request->withAttribute('user', $user));
         }
