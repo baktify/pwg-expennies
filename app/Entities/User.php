@@ -34,6 +34,9 @@ class User implements UserInterface
     #[Column]
     private string $name;
 
+    #[Column(name: 'verified_at', nullable: true)]
+    private ?\DateTime $verifiedAt;
+
     #[OneToMany(mappedBy: 'user', targetEntity: Category::class)]
     private Collection $categories;
 
@@ -82,6 +85,11 @@ class User implements UserInterface
     {
         $this->name = $name;
         return $this;
+    }
+
+    public function getVerifiedAt(): ?\DateTime
+    {
+        return $this->verifiedAt;
     }
 
     public function getCategories(): Collection

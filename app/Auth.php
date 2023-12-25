@@ -14,7 +14,7 @@ class Auth implements AuthInterface
 
     public function __construct(
         private readonly UserProviderServiceInterface $userProviderService,
-        private readonly SessionInterface             $session
+        private readonly SessionInterface             $session,
     )
     {
     }
@@ -46,11 +46,7 @@ class Auth implements AuthInterface
             return false;
         }
 
-        if (!$this->authenticate($user)) {
-            return false;
-        }
-
-        return true;
+        return $this->authenticate($user);
     }
 
     public function checkCredentials(UserInterface $user, array $credentials): bool
@@ -76,7 +72,7 @@ class Auth implements AuthInterface
     {
         $this->user = $user;
 
-        if (! $this->session->regenerate()) {
+        if (!$this->session->regenerate()) {
             return false;
         };
 

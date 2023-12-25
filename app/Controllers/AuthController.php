@@ -6,6 +6,7 @@ use App\Contracts\AuthInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\UserRegisterData;
 use App\Exceptions\ValidationException;
+use App\Mail\SignupEmail;
 use App\RequestValidators\UserLogInRequestValidator;
 use App\RequestValidators\UserRegisterRequestValidator;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -18,6 +19,7 @@ class AuthController
         private readonly Twig                             $twig,
         private readonly AuthInterface                    $auth,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
+        private readonly SignupEmail                      $signupEmail,
     )
     {
     }
@@ -34,7 +36,9 @@ class AuthController
 
     public function logIn(Request $request, Response $response): Response
     {
-        $data = $this->requestValidatorFactory->make(UserLogInRequestValidator::class)->validate($request->getParsedBody());
+        $data = $this->requestValidatorFactory->make(UserLogInRequestValidator::class)->validate(
+            $request->getParsedBody()
+        );
 
         if (!$this->auth->attempt($data)) {
             throw new ValidationException(['password' => ['You have entered a wrong email or password']]);
@@ -55,6 +59,8 @@ class AuthController
             new UserRegisterData($data['name'], $data['email'], $data['password'])
         );
 
+        $this->signupEmail->send($data['email']);
+
         return $response->withHeader('Location', '/')->withStatus(302);
     }
 
@@ -65,5 +71,10 @@ class AuthController
         return $response
             ->withHeader('Location', '/login')
             ->withStatus(302);
+    }
+
+    public function verify(Response $response): Response
+    {
+        return $this->twig->render($response, 'auth/verify.twig');
     }
 }
