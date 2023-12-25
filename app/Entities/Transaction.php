@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entities;
 
+use App\Contracts\OwnableInterface;
 use App\Entities\Traits\HasTimestamps;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,7 +21,7 @@ use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\Table;
 
 #[Entity, Table('transactions'), HasLifecycleCallbacks]
-class Transaction
+class Transaction implements OwnableInterface
 {
     use HasTimestamps;
 

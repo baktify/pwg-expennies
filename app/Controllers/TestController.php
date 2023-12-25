@@ -36,16 +36,13 @@ class TestController
     public function test(Request $request, Response $response): Response
     {
         $x = new \ReflectionMethod(TestController::class, 'foo');
-        $y = new \ReflectionFunction(function() {
 
-        });
-        dd($x, $y);
+        $param = $x->getParameters()[2];
 
         return $response;
     }
 
-    #[ManyToOne(targetEntity: Receipt::class)]
-    public function foo(string $firstname, int $age): string
+    public function foo(string $firstname, int $age, $bar): string
     {
 
     }

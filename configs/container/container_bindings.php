@@ -15,6 +15,7 @@ use App\EntityBindingRouteStrategy;
 use App\Enums\AppEnvironment;
 use App\Enums\SameSite;
 use App\Enums\StorageDriver;
+use App\Filters\UserFilter;
 use App\RequestValidators\RequestValidatorFactory;
 use App\Services\EntityManagerService;
 use App\Services\UserProviderService;
@@ -70,6 +71,8 @@ return [
             $config->get('doctrine.entity_dir'),
             $config->get('doctrine.dev_mode')
         );
+        $ORMConfig->addFilter('user', UserFilter::class);
+
         return new EntityManager($connection, $ORMConfig);
     },
 
