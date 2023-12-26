@@ -24,8 +24,6 @@ class GuestMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        return $this->responseFactory
-            ->createResponse(302)
-            ->withHeader('Location', '/');
+        return $this->responseFactory->createResponse(302)->withHeader('Location', '/');
     }
 }

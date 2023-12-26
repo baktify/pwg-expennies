@@ -37,9 +37,9 @@ class ValidationExceptionMiddleware implements MiddlewareInterface
                 );
             }
 
-            $oldData = $request->getParsedBody();
             $referer = $this->requestService->getReferer($request);
 
+            $oldData = $request->getParsedBody();
             $sensitiveKeys = array_flip(['password', 'confirmPassword']);
             $oldDataFiltered = array_diff_key($oldData, $sensitiveKeys);
 
