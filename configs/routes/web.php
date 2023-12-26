@@ -12,6 +12,7 @@ use App\Controllers\TransactionController;
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\GuestMiddleware;
 use App\EntityBindingRouteStrategy;
+use App\Middlewares\RedirectVerifiedUserMiddleware;
 use App\Middlewares\VerifyEmailMiddleware;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
@@ -29,6 +30,11 @@ return function (App $app) {
 
     $app->group('', function (RouteCollectorProxy $group) {
         $group->get('/verify', [AuthController::class, 'verify']);
+    })
+        ->add(RedirectVerifiedUserMiddleware::class)
+        ->add(AuthMiddleware::class);
+
+    $app->group('', function (RouteCollectorProxy $group) {
         $group->post('/logout', [AuthController::class, 'logOut']);
     })->add(AuthMiddleware::class);
 
@@ -58,5 +64,7 @@ return function (App $app) {
             $transactions->get('/{transaction}/receipts/{receipt}', [ReceiptController::class, 'download']);
             $transactions->delete('/{transaction}/receipts/{receipt}', [ReceiptController::class, 'delete']);
         });
-    })->add(VerifyEmailMiddleware::class)->add(AuthMiddleware::class);
+    })
+        ->add(VerifyEmailMiddleware::class)
+        ->add(AuthMiddleware::class);
 };

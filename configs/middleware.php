@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Config;
 use App\Enums\AppEnvironment;
 use App\Middlewares\CsrfFieldsMiddleware;
+use App\Middlewares\RedirectFromVerifyRouteIfUserVerifiedMiddleware;
 use App\Middlewares\SessionStartMiddleware;
 use App\Middlewares\TwigValidationErrorsMiddleware;
 use App\Middlewares\TwigValidationOldValuesMiddleware;
