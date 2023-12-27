@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Config;
 use App\Contracts\AuthInterface;
 use App\Contracts\EntityManagerServiceInterface;
 use App\Entities\Category;
@@ -24,6 +25,7 @@ class TestController
 {
     public function __construct(
         private readonly EntityManagerServiceInterface $entityManager,
+        private readonly Config                        $config,
         private readonly Filesystem                    $filesystem,
         private readonly Clockwork                     $clockwork,
         private readonly CategoryService               $categoryService,
@@ -35,9 +37,11 @@ class TestController
 
     public function test(Request $request, Response $response): Response
     {
-        $x = new \ReflectionMethod(TestController::class, 'foo');
+        $uri = $request->getUri();
 
-        $param = $x->getParameters()[2];
+        dd(
+            $this->config->get('app_url')
+        );
 
         return $response;
     }

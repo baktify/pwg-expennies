@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\EntityManagerServiceInterface;
-use App\Contracts\UserInterface;
+use App\Entities\User;
 use Doctrine\ORM\EntityManagerInterface;
 use http\Exception\BadMethodCallException;
 

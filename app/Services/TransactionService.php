@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\EntityManagerServiceInterface;
-use App\Contracts\UserInterface;
 use App\DataObjects\CsvTransactionData;
 use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
 use App\Entities\Receipt;
 use App\Entities\Transaction;
+use App\Entities\User;
 use DateTime;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
@@ -52,7 +52,7 @@ class TransactionService
         string        $description,
         float         $amount,
         DateTime      $date,
-        UserInterface $user,
+        User $user,
         ?Category     $category = null,
     ): Transaction
     {

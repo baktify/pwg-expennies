@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\EntityManagerServiceInterface;
-use App\Contracts\UserInterface;
+use App\Entities\User;
 use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -16,7 +16,7 @@ class CategoryService
     {
     }
 
-    public function create(string $name, UserInterface $user): Category
+    public function create(string $name, User $user): Category
     {
         $category = new Category();
         $category->setName($name);
@@ -98,7 +98,7 @@ class CategoryService
         };
     }
 
-    public function getByNameOrNew(string $categoryName, UserInterface $user): ?Category
+    public function getByNameOrNew(string $categoryName, User $user): ?Category
     {
         $category = $this->getByName($categoryName);
 

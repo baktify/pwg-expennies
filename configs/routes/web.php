@@ -9,10 +9,12 @@ use App\Controllers\ReceiptController;
 use App\Controllers\SeedController;
 use App\Controllers\TestController;
 use App\Controllers\TransactionController;
+use App\Controllers\VerificationController;
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\GuestMiddleware;
 use App\EntityBindingRouteStrategy;
 use App\Middlewares\RedirectVerifiedUserMiddleware;
+use App\Middlewares\ValidateSignatureMiddleware;
 use App\Middlewares\VerifyEmailMiddleware;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
@@ -29,7 +31,9 @@ return function (App $app) {
     })->add(GuestMiddleware::class);
 
     $app->group('', function (RouteCollectorProxy $group) {
-        $group->get('/verify', [AuthController::class, 'verify']);
+        $group->get('/verify', [VerificationController::class, 'index']);
+        $group->get('/verify/{userId}/{emailHash}', [VerificationController::class, 'verify'])
+            ->setName('verify')->add(ValidateSignatureMiddleware::class);
     })
         ->add(RedirectVerifiedUserMiddleware::class)
         ->add(AuthMiddleware::class);

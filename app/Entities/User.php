@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entities;
 
 use App\Contracts\OwnableInterface;
-use App\Contracts\UserInterface;
 use App\Entities\Traits\HasTimestamps;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -18,7 +17,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
 
 #[Entity, Table('users'), HasLifecycleCallbacks]
-class User implements UserInterface
+class User
 {
     use HasTimestamps;
 
@@ -90,6 +89,12 @@ class User implements UserInterface
     public function getVerifiedAt(): ?\DateTime
     {
         return $this->verifiedAt;
+    }
+
+    public function setVerifiedAt(?\DateTime $verifiedAt): User
+    {
+        $this->verifiedAt = $verifiedAt;
+        return $this;
     }
 
     public function getCategories(): Collection

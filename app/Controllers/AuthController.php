@@ -55,11 +55,11 @@ class AuthController
             $request->getParsedBody()
         );
 
-        $this->auth->register(
+        $user = $this->auth->register(
             new UserRegisterData($data['name'], $data['email'], $data['password'])
         );
 
-        $this->signupEmail->send($data['email']);
+        $this->signupEmail->send($user);
 
         return $response->withHeader('Location', '/')->withStatus(302);
     }
@@ -71,10 +71,5 @@ class AuthController
         return $response
             ->withHeader('Location', '/login')
             ->withStatus(302);
-    }
-
-    public function verify(Response $response): Response
-    {
-        return $this->twig->render($response, 'auth/verify.twig');
     }
 }

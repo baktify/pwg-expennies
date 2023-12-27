@@ -4,22 +4,22 @@ namespace App;
 
 use App\Contracts\AuthInterface;
 use App\Contracts\SessionInterface;
-use App\Contracts\UserInterface;
-use App\Contracts\UserProviderServiceInterface;
 use App\DataObjects\UserRegisterData;
+use App\Services\UserService;
+use App\Entities\User;
 
 class Auth implements AuthInterface
 {
-    private ?UserInterface $user = null;
+    private ?User $user = null;
 
     public function __construct(
-        private readonly UserProviderServiceInterface $userProviderService,
-        private readonly SessionInterface             $session,
+        private readonly UserService      $userService,
+        private readonly SessionInterface $session,
     )
     {
     }
 
-    public function user(): ?UserInterface
+    public function user(): ?User
     {
         if ($this->user !== null) {
             return $this->user;
@@ -29,7 +29,7 @@ class Auth implements AuthInterface
             return null;
         }
 
-        $user = $this->userProviderService->find($userId);
+        $user = $this->userService->find($userId);
 
         if ($user === null) {
             return null;
@@ -40,7 +40,7 @@ class Auth implements AuthInterface
 
     public function attempt(array $credentials): bool
     {
-        $user = $this->userProviderService->getByCredentials($credentials);
+        $user = $this->userService->getByCredentials($credentials);
 
         if (!$user || !$this->checkCredentials($user, $credentials)) {
             return false;
@@ -49,7 +49,7 @@ class Auth implements AuthInterface
         return $this->authenticate($user);
     }
 
-    public function checkCredentials(UserInterface $user, array $credentials): bool
+    public function checkCredentials(User $user, array $credentials): bool
     {
         return password_verify($credentials['password'], $user->getPassword());
     }
@@ -61,14 +61,16 @@ class Auth implements AuthInterface
         $this->user = null;
     }
 
-    public function register(UserRegisterData $data): void
+    public function register(UserRegisterData $data): User
     {
-        $user = $this->userProviderService->createUser($data);
+        $user = $this->userService->createUser($data);
 
         $this->authenticate($user);
+
+        return $user;
     }
 
-    public function authenticate(UserInterface $user)
+    public function authenticate(User $user)
     {
         $this->user = $user;
 

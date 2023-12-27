@@ -8,7 +8,6 @@ use App\Contracts\AuthInterface;
 use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Contracts\SessionInterface;
-use App\Contracts\UserProviderServiceInterface;
 use App\Csrf;
 use App\DataObjects\SessionConfig;
 use App\EntityBindingRouteStrategy;
@@ -18,7 +17,6 @@ use App\Enums\StorageDriver;
 use App\Filters\UserFilter;
 use App\RequestValidators\RequestValidatorFactory;
 use App\Services\EntityManagerService;
-use App\Services\UserProviderService;
 use App\Session;
 use Clockwork\Clockwork;
 use Clockwork\DataSource\DoctrineDataSource;
@@ -34,6 +32,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\App;
 use Slim\Csrf\Guard;
 use Slim\Factory\AppFactory;
+use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
@@ -57,10 +56,9 @@ return [
         AppFactory::setContainer($container);
         $app = AppFactory::create();
 
-        $app->getRouteCollector()->setDefaultInvocationStrategy(new EntityBindingRouteStrategy(
-            $container->get(EntityManagerServiceInterface::class),
-//            $app->getResponseFactory(),
-        ));
+        $app->getRouteCollector()->setDefaultInvocationStrategy(
+            new EntityBindingRouteStrategy($container->get(EntityManagerServiceInterface::class))
+        );
 
         $addMiddlewares($app);
         $router($app);
@@ -108,9 +106,6 @@ return [
 
     ResponseFactoryInterface::class => fn(App $app) => $app->getResponseFactory(),
     AuthInterface::class => fn(ContainerInterface $container) => $container->get(Auth::class),
-    UserProviderServiceInterface::class => fn(ContainerInterface $container) => $container->get(
-        UserProviderService::class
-    ),
     SessionInterface::class => function (Config $config) {
         return new Session(
             new SessionConfig(
@@ -148,4 +143,5 @@ return [
         return new Mailer($transporter);
     },
     BodyRendererInterface::class => fn(Twig $twig) => new BodyRenderer($twig->getEnvironment()),
+    RouteParserInterface::class => fn(App $app) => $app->getRouteCollector()->getRouteParser(),
 ];

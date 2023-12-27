@@ -2,6 +2,7 @@
 
 namespace App\Contracts;
 
+use App\Entities\User;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
