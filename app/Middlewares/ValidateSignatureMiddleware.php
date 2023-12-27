@@ -32,7 +32,7 @@ class ValidateSignatureMiddleware implements MiddlewareInterface
         );
 
         if (!hash_equals($signature, $signatureCompare) || $timestamp <= time()) {
-            throw new \RuntimeException('Failed to verify account');
+            throw new \RuntimeException('Verification link is invalid');
         }
 
         return $handler->handle($request);

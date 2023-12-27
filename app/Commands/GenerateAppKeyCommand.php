@@ -21,42 +21,28 @@ class GenerateAppKeyCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $envFile = '.env';
-        $envPath = ROOT_PATH . '/' . $envFile;
+        $envPath = ROOT_PATH . '/.env';
 
         if (!file_exists($envPath)) {
             $output->writeln('Environment file does not exist');
             return Command::FAILURE;
         }
 
-        if ($this->appKeyExists($envPath)) {
-            $output->writeln('APP_KEY already exists.');
-            $output->writeln('Remove the APP_KEY variable from "' . $envFile . '"');
-            return Command::FAILURE;
-        };
+        $appKeyValue = base64_encode(random_bytes(32));
 
-        $secretKey = bin2hex(random_bytes(25));
+        $envFileContents = file_get_contents($envPath);
 
-        file_put_contents(
-            $envPath,
-            PHP_EOL . 'APP_KEY=' . $secretKey,
-            FILE_APPEND
-        );
-
-        return Command::SUCCESS;
-    }
-
-    public function appKeyExists($envPath)
-    {
-        $result = false;
-
-        $resource = fopen($envPath, 'r');
-        while ($line = fgets($resource)) {
-            if (str_starts_with($line, 'APP_KEY=')) {
-                $result = true;
-            }
+        $pattern = '/^APP_KEY=.*/m';
+        if (preg_match($pattern, $envFileContents)) {
+            $envFileContents = preg_replace($pattern, 'APP_KEY=' . $appKeyValue, $envFileContents);
+        } else {
+            $envFileContents .= PHP_EOL . 'APP_KEY=' . $appKeyValue;
         }
 
-        return $result;
+        file_put_contents($envPath, $envFileContents);
+
+        $output->writeln('App key was successfully generated');
+
+        return Command::SUCCESS;
     }
 }

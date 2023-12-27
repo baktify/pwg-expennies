@@ -40,7 +40,7 @@ class TestController
         $uri = $request->getUri();
 
         dd(
-            $this->config->get('app_url')
+            base64_encode(random_bytes(32)),
         );
 
         return $response;

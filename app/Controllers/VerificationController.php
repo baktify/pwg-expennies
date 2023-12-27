@@ -32,7 +32,7 @@ class VerificationController
         $emailHash = $args['emailHash'];
 
         if (($user->getId() !== (int)$userId) || !hash_equals($emailHash, sha1($user->getEmail()))) {
-            throw new \RuntimeException('Failed to verify account');
+            throw new \RuntimeException('Verification link is invalid');
         }
 
         $this->userService->verifyUser($user);
