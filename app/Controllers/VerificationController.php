@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Entities\User;
+use App\Mail\SignupEmail;
 use App\Services\UserService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -13,6 +14,7 @@ class VerificationController
     public function __construct(
         private readonly Twig        $twig,
         private readonly UserService $userService,
+        private readonly SignupEmail $signupEmail,
     )
     {
     }
@@ -36,5 +38,15 @@ class VerificationController
         $this->userService->verifyUser($user);
 
         return $response->withHeader('Location', '/')->withStatus(302);
+    }
+
+    public function resendVerification(Request $request, Response $response): Response
+    {
+        $user = $request->getAttribute('user');
+
+        $this->signupEmail->send($user);
+
+        $response->getBody()->write('Verification link was sent.');
+        return $response;
     }
 }

@@ -34,6 +34,7 @@ return function (App $app) {
         $group->get('/verify', [VerificationController::class, 'index']);
         $group->get('/verify/{userId}/{emailHash}', [VerificationController::class, 'verify'])
             ->setName('verify')->add(ValidateSignatureMiddleware::class);
+        $group->get('/resend-verification', [VerificationController::class, 'resendVerification']);
     })
         ->add(RedirectVerifiedUserMiddleware::class)
         ->add(AuthMiddleware::class);
