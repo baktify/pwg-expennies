@@ -18,7 +18,6 @@ class ValidateSignatureMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $uri = $request->getUri();
         $queryParams = $request->getQueryParams();
         $timestamp = (int) ($queryParams['expiration'] ?? 0);
         $signature = $queryParams['signature'] ?? '';
