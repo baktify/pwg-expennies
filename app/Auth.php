@@ -55,9 +55,7 @@ class Auth implements AuthInterface
             return $this->startLoginWith2FA($user);
         }
 
-        $this->authenticate($user);
-
-        return AuthAttemptStatus::SUCCESS;
+        return $this->authenticate($user);
     }
 
     public function checkCredentials(User $user, array $credentials): bool
@@ -81,23 +79,23 @@ class Auth implements AuthInterface
         return $user;
     }
 
-    public function authenticate(User $user)
+    public function authenticate(User $user): AuthAttemptStatus
     {
         $this->user = $user;
 
         if (!$this->session->regenerate()) {
-            return false;
+            return AuthAttemptStatus::FAILED;
         };
 
         $this->session->put('user', $user->getId());
 
-        return true;
+        return AuthAttemptStatus::SUCCESS;
     }
 
     private function startLoginWith2FA(User $user): AuthAttemptStatus
     {
         if (!$this->session->regenerate()) {
-            return AuthAttemptStatus::FAILED;
+            return AuthAttemptStatus::INTERNAL_SERVER_ERROR;
         }
 
         $this->session->put('2FA', $user->getId());

@@ -11,6 +11,7 @@ use App\Mail\SignupEmail;
 use App\RequestValidators\UserLogInRequestValidator;
 use App\RequestValidators\UserRegisterRequestValidator;
 use App\ResponseFormatter;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -23,6 +24,7 @@ class AuthController
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly ResponseFormatter                $responseFormatter,
         private readonly SignupEmail                      $signupEmail,
+        private readonly ResponseFactoryInterface         $responseFactory,
     )
     {
     }
@@ -47,6 +49,10 @@ class AuthController
 
         if ($status === AuthAttemptStatus::FAILED) {
             throw new ValidationException(['password' => ['You have entered a wrong email or password']]);
+        }
+
+        if ($status === AuthAttemptStatus::INTERNAL_SERVER_ERROR) {
+            return $this->responseFormatter->asJson($response->withStatus(500), ['message' => ['error' => 'Internal server error']]);
         }
 
         if ($status === AuthAttemptStatus::TWO_FACTOR_AUTH) {

@@ -7,8 +7,9 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\Table;
 
-#[Entity]
+#[Entity, Table('user_login_codes')]
 class UserLoginCode
 {
     #[Id, GeneratedValue, Column(options: ['unsigned' => true])]
