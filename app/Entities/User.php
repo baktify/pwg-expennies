@@ -125,4 +125,11 @@ class User
     {
         return $this->getId() === $entity->getUser()->getId();
     }
+
+    public function hasTwoFactorAuthEnabled()
+    {
+        // TODO:
+
+        return true;
+    }
 }

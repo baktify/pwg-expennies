@@ -8,6 +8,21 @@ const axe = axios.create({
     }
 })
 
+export const logIn = async (formData, parentDom) => {
+    try {
+        clearErrors(parentDom)
+
+        const {status, data} = await axe.post('/login', {
+            ...formData,
+            ...getCsrfFields()
+        })
+
+        return {status, data}
+    } catch ({status, response: {data: errors}}) {
+        handleErrors(errors, parentDom)
+    }
+}
+
 /** Transaction requests */
 export const toggleTransactionReview = async (transactionId) => {
     try {
@@ -201,7 +216,6 @@ const handleErrors = (errors, domElement) => {
     for (const error in errors) {
         const input = domElement.querySelector(`[name="${error}"]`)
         const inputParent = input.parentElement
-
         input.classList.add('is-invalid')
 
         for (const message of errors[error]) {

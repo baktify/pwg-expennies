@@ -5,10 +5,12 @@ namespace App\Controllers;
 use App\Contracts\AuthInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\UserRegisterData;
+use App\Enums\AuthAttemptStatus;
 use App\Exceptions\ValidationException;
 use App\Mail\SignupEmail;
 use App\RequestValidators\UserLogInRequestValidator;
 use App\RequestValidators\UserRegisterRequestValidator;
+use App\ResponseFormatter;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -19,6 +21,7 @@ class AuthController
         private readonly Twig                             $twig,
         private readonly AuthInterface                    $auth,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
+        private readonly ResponseFormatter                $responseFormatter,
         private readonly SignupEmail                      $signupEmail,
     )
     {
@@ -40,13 +43,17 @@ class AuthController
             $request->getParsedBody()
         );
 
-        if (!$this->auth->attempt($data)) {
+        $status = $this->auth->attempt($data);
+
+        if ($status === AuthAttemptStatus::FAILED) {
             throw new ValidationException(['password' => ['You have entered a wrong email or password']]);
         }
 
-        return $response
-            ->withHeader('Location', '/')
-            ->withStatus(302);
+        if ($status === AuthAttemptStatus::TWO_FACTOR_AUTH) {
+            return $this->responseFormatter->asJson($response, ['two_factor' => true]);
+        }
+
+        return $this->responseFormatter->asJson($response);
     }
 
     public function register(Request $request, Response $response): Response

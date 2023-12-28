@@ -15,8 +15,7 @@
                                          alt="Expennies Logo" />
                                     Login
                                 </h2>
-                                <form method="post" action="/login">
-                                    {% include 'form/csrf.twig' %}
+                                <form>
                                     <div class="form-outline form-white mb-4">
                                         <input type="email"
                                                name="email"
@@ -34,10 +33,9 @@
                                             {{ errors.password | first }}
                                         </div>
                                     </div>
-                                    <p class="mb-4 text-end"><a class="text-secondary fw-semibold" href="#">Forgot
-                                            password?</a></p>
-                                    <button class="btn btn-primary bg-gradient text-white btn-lg px-5" type="submit">Log
-                                        In
+                                    <p class="mb-4 text-end"><a class="text-secondary fw-semibold" href="#">Forgot password?</a></p>
+                                    <button class="btn btn-primary bg-gradient text-white btn-lg px-5 log-in-btn" type="submit">
+                                        Log In
                                     </button>
                                 </form>
                             </div>
@@ -51,5 +49,6 @@
                 </div>
             </div>
         </div>
+        {% include 'auth/two_factor_auth_modal.twig' %}
     </section>
 {% endblock %}

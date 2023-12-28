@@ -5,6 +5,9 @@ namespace App;
 use App\Contracts\AuthInterface;
 use App\Contracts\SessionInterface;
 use App\DataObjects\UserRegisterData;
+use App\Enums\AuthAttemptStatus;
+use App\Mail\TwoFactorAuthEmail;
+use App\Services\UserLoginCodeService;
 use App\Services\UserService;
 use App\Entities\User;
 
@@ -13,8 +16,10 @@ class Auth implements AuthInterface
     private ?User $user = null;
 
     public function __construct(
-        private readonly UserService      $userService,
-        private readonly SessionInterface $session,
+        private readonly UserService          $userService,
+        private readonly SessionInterface     $session,
+        private readonly TwoFactorAuthEmail   $twoFactorAuthEmail,
+        private readonly UserLoginCodeService $userLoginCodeService,
     )
     {
     }
@@ -38,15 +43,21 @@ class Auth implements AuthInterface
         return $this->user = $user;
     }
 
-    public function attempt(array $credentials): bool
+    public function attempt(array $credentials): AuthAttemptStatus
     {
         $user = $this->userService->getByCredentials($credentials);
 
         if (!$user || !$this->checkCredentials($user, $credentials)) {
-            return false;
+            return AuthAttemptStatus::FAILED;
         }
 
-        return $this->authenticate($user);
+        if ($user->hasTwoFactorAuthEnabled()) {
+            return $this->startLoginWith2FA($user);
+        }
+
+        $this->authenticate($user);
+
+        return AuthAttemptStatus::SUCCESS;
     }
 
     public function checkCredentials(User $user, array $credentials): bool
@@ -81,5 +92,20 @@ class Auth implements AuthInterface
         $this->session->put('user', $user->getId());
 
         return true;
+    }
+
+    private function startLoginWith2FA(User $user): AuthAttemptStatus
+    {
+        if (!$this->session->regenerate()) {
+            return AuthAttemptStatus::FAILED;
+        }
+
+        $this->session->put('2FA', $user->getId());
+
+        $this->twoFactorAuthEmail->send(
+            $this->userLoginCodeService->generate($user)
+        );
+
+        return AuthAttemptStatus::TWO_FACTOR_AUTH;
     }
 }
