@@ -15,7 +15,7 @@ class UserLoginCode
     #[Id, GeneratedValue, Column(options: ['unsigned' => true])]
     private int $id;
 
-    #[Column]
+    #[Column(length: 6)]
     private string $code;
 
     #[Column(name: 'is_active', options: ['default' => true])]

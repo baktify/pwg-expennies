@@ -85,7 +85,7 @@ class Auth implements AuthInterface
     public function authenticate(User $user): AuthAttemptStatus
     {
         if (!$this->session->regenerate()) {
-            return AuthAttemptStatus::FAILED;
+            return AuthAttemptStatus::INTERNAL_SERVER_ERROR;
         };
 
         $this->session->put('user', $user->getId());
@@ -126,6 +126,7 @@ class Auth implements AuthInterface
             throw new ValidationException(['code' => ['Invalid code']]);
         }
 
+        $this->session->forget('2FA');
         $status = $this->authenticate($user);
 
         if ($status === AuthAttemptStatus::SUCCESS) {
