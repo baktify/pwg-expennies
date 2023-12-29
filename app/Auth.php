@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 use App\Contracts\AuthInterface;
 use App\Contracts\SessionInterface;
 use App\DataObjects\UserRegisterData;
 use App\Enums\AuthAttemptStatus;
+use App\Exceptions\ValidationException;
 use App\Mail\TwoFactorAuthEmail;
 use App\Services\UserLoginCodeService;
 use App\Services\UserService;
@@ -81,8 +84,6 @@ class Auth implements AuthInterface
 
     public function authenticate(User $user): AuthAttemptStatus
     {
-        $this->user = $user;
-
         if (!$this->session->regenerate()) {
             return AuthAttemptStatus::FAILED;
         };
@@ -100,10 +101,37 @@ class Auth implements AuthInterface
 
         $this->session->put('2FA', $user->getId());
 
+        $this->userLoginCodeService->deactivateAllActiveCodes($user);
+
         $this->twoFactorAuthEmail->send(
             $this->userLoginCodeService->generate($user)
         );
 
         return AuthAttemptStatus::TWO_FACTOR_AUTH;
+    }
+
+    public function attempt2FA(string $code): AuthAttemptStatus
+    {
+        $userId = $this->session->get('2FA');
+
+        if (!$userId) {
+            return AuthAttemptStatus::FAILED;
+        }
+
+        if (!($user = $this->userService->find($userId))) {
+            return AuthAttemptStatus::FAILED;
+        }
+
+        if (!$this->userLoginCodeService->verify($user, $code)) {
+            throw new ValidationException(['code' => ['Invalid code']]);
+        }
+
+        $status = $this->authenticate($user);
+
+        if ($status === AuthAttemptStatus::SUCCESS) {
+            $this->userLoginCodeService->deactivateAllActiveCodes($user);
+        }
+
+        return $status;
     }
 }

@@ -8,10 +8,10 @@ use App\DataObjects\UserRegisterData;
 use App\Enums\AuthAttemptStatus;
 use App\Exceptions\ValidationException;
 use App\Mail\SignupEmail;
+use App\RequestValidators\TwoFactorLoginRequestValidator;
 use App\RequestValidators\UserLogInRequestValidator;
 use App\RequestValidators\UserRegisterRequestValidator;
 use App\ResponseFormatter;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -24,7 +24,6 @@ class AuthController
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly ResponseFormatter                $responseFormatter,
         private readonly SignupEmail                      $signupEmail,
-        private readonly ResponseFactoryInterface         $responseFactory,
     )
     {
     }
@@ -84,5 +83,20 @@ class AuthController
         return $response
             ->withHeader('Location', '/login')
             ->withStatus(302);
+    }
+
+    public function loginTwoFactor(Request $request, Response $response): Response
+    {
+        $data = $this->requestValidatorFactory->make(TwoFactorLoginRequestValidator::class)->validate(
+            $request->getParsedBody()
+        );
+
+        $status = $this->auth->attempt2FA($data['code']);
+
+        if ($status === AuthAttemptStatus::FAILED) {
+            return $this->responseFormatter->asJson($response->withStatus(500), ['code' => ['Something went wrong']]);
+        }
+
+        return $response;
     }
 }

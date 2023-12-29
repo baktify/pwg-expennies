@@ -1,18 +1,36 @@
 import "../css/auth.scss"
-import {logIn} from "./requests.js"
+import {logIn, twoFactorLogIn} from "./requests.js"
 import {Modal} from "bootstrap"
 
 const init = () => {
     const loginBtn = document.querySelector('.log-in-btn')
     const loginForm = loginBtn.closest('form')
     const twoFactorAuthModal = new Modal('#twoFactorAuthModal')
+    const twoFactorLoginBtn = document.querySelector('.log-in-two-factor')
+    const twoFactorLoginForm = twoFactorLoginBtn.closest('form')
 
-    const onSubmitLoginForm = (event) => {
-        event.preventDefault()
+    console.log(twoFactorLoginBtn, twoFactorLoginForm)
 
-        const formData = Object.fromEntries((new FormData(event.target)))
+    const onSubmitTwoFactorLoginForm = (e) => {
+        e.preventDefault()
 
-        logIn(formData, event.target).then(({status, data}) => {
+        const formData = Object.fromEntries(
+            new FormData(e.target)
+        )
+
+        twoFactorLogIn(formData, e.target).then(({status}) => {
+            if (status === 200) {
+                window.location = '/'
+            }
+        })
+    }
+
+    const onSubmitLoginForm = (e) => {
+        e.preventDefault()
+
+        const formData = Object.fromEntries((new FormData(e.target)))
+
+        logIn(formData, e.target).then(({status, data}) => {
             if (data.two_factor) {
                 twoFactorAuthModal.show()
             } else {
@@ -22,6 +40,7 @@ const init = () => {
     }
 
     loginForm.addEventListener('submit', onSubmitLoginForm)
+    twoFactorLoginForm.addEventListener('submit', onSubmitTwoFactorLoginForm)
 }
 
 document.addEventListener('DOMContentLoaded', init)

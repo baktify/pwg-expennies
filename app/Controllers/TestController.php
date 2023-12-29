@@ -8,8 +8,11 @@ use App\Contracts\EntityManagerServiceInterface;
 use App\Entities\Category;
 use App\Entities\Receipt;
 use App\Entities\Transaction;
+use App\Entities\UserLoginCode;
 use App\Services\CategoryService;
 use App\Services\TransactionService;
+use App\Services\UserLoginCodeService;
+use App\Services\UserService;
 use Cassandra\Date;
 use Clockwork\Clockwork;
 use Clockwork\DataSource\DoctrineDataSource;
@@ -31,23 +34,19 @@ class TestController
         private readonly CategoryService               $categoryService,
         private readonly TransactionService            $transactionService,
         private readonly AuthInterface                 $auth,
+        private readonly UserService                   $userService,
+        private readonly UserLoginCodeService          $userLoginCodeService,
     )
     {
     }
 
     public function test(Request $request, Response $response): Response
     {
-        $uri = $request->getUri();
+        $user = $this->userService->find(1);
 
-        dd(
-            base64_encode(random_bytes(32)),
-        );
+        $this->userLoginCodeService->deactivateAllActiveCodes($user);
 
+        echo 123;
         return $response;
-    }
-
-    public function foo(string $firstname, int $age, $bar): string
-    {
-
     }
 }

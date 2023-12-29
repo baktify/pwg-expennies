@@ -25,8 +25,9 @@ return function (App $app) {
 
     $app->group('', function (RouteCollectorProxy $guest) {
         $guest->get('/login', [AuthController::class, 'loginView']);
-        $guest->get('/register', [AuthController::class, 'registerView']);
         $guest->post('/login', [AuthController::class, 'logIn']);
+        $guest->post('/login/two-factor', [AuthController::class, 'loginTwoFactor']);
+        $guest->get('/register', [AuthController::class, 'registerView']);
         $guest->post('/register', [AuthController::class, 'register']);
     })->add(GuestMiddleware::class);
 

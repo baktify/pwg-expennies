@@ -8,6 +8,21 @@ const axe = axios.create({
     }
 })
 
+export const twoFactorLogIn = async (formData, parentDom) => {
+    try {
+        clearErrors(parentDom)
+
+        const {status, data} = await axe.post('/login/two-factor', {
+            ...formData,
+            ...getCsrfFields()
+        })
+
+        return {status, data}
+    } catch ({status, response: {data: errors}}) {
+        handleErrors(errors, parentDom)
+    }
+}
+
 export const logIn = async (formData, parentDom) => {
     try {
         clearErrors(parentDom)

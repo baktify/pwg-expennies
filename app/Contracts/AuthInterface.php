@@ -17,4 +17,6 @@ interface AuthInterface
     public function logOut(): void;
 
     public function register(UserRegisterData $data): User;
+
+    public function attempt2FA(string $code): AuthAttemptStatus;
 }
