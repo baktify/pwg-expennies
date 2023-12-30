@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\UserProfileData;
 use App\Exceptions\ValidationException;
@@ -12,6 +13,7 @@ use App\RequestValidators\PasswordUpdateRequestValidator;
 use App\RequestValidators\ProfileUpdateRequestValidator;
 use App\Services\UserProfileService;
 use App\Services\UserService;
+use Doctrine\ORM\UnitOfWork;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\Twig;
@@ -23,6 +25,7 @@ class ProfileController
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly UserProfileService               $userProfileService,
         private readonly UserService                      $userService,
+        private readonly EntityManagerServiceInterface    $entityManagerService,
     )
     {
     }
@@ -69,12 +72,11 @@ class ProfileController
         }
 
         // Check if current password matches
-        $password = $data['currentPassword'];
-        if (!$this->userService->checkPasswordMatch($user, $password)) {
+        if (!$this->userService->checkPasswordMatch($user, $data['currentPassword'])) {
             throw new ValidationException(['currentPassword' => ['Incorrect current password']]);
         }
-
-        $this->userService->updatePassword($user, $password);
+        $this->userService->updatePassword($user, $data['newPassword']);
+        $this->entityManagerService->sync();
 
         return $response;
     }

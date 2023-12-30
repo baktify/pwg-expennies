@@ -3,9 +3,7 @@
 namespace App\RequestValidators;
 
 use App\Contracts\RequestValidatorInterface;
-use App\Entities\User;
 use App\Exceptions\ValidationException;
-use Doctrine\ORM\EntityManagerInterface;
 use Valitron\Validator;
 
 class PasswordUpdateRequestValidator implements RequestValidatorInterface
@@ -14,7 +12,7 @@ class PasswordUpdateRequestValidator implements RequestValidatorInterface
     {
         $v = new Validator($data);
         $v->rule('required', 'currentPassword')->label('Current password');
-        $v->rule('requiredWith', 'newPassword', 'currentPassword')->label('New password');
+        $v->rule('required', 'newPassword')->label('New password');
 
         $v->rule(function ($field, $value, $params, $fields) {
             return $value !== $fields['currentPassword'];

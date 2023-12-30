@@ -281,7 +281,7 @@ const handleErrors = (errors, domElement) => {
         input.classList.add('is-invalid')
 
         // for (const message of errors[error]) {
-        const message = errors[error];
+        const message = errors[error][0];
         const errorDiv = `<div class="invalid-feedback">${message}</div>`
 
         inputParent.innerHTML += errorDiv

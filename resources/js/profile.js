@@ -39,6 +39,7 @@ const init = () => {
     }
 
     const onHideUpdatePasswordModal = () => {
+        console.log(123 )
         updatePasswordForm.reset()
         clearErrors(updatePasswordForm)
     }
