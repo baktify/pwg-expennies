@@ -36,6 +36,9 @@ class User
     #[Column(name: 'verified_at', nullable: true)]
     private ?\DateTime $verifiedAt;
 
+    #[Column(name: 'two_factor', options: ['default' => false])]
+    private bool $twoFactor;
+
     #[OneToMany(mappedBy: 'user', targetEntity: Category::class)]
     private Collection $categories;
 
@@ -46,6 +49,7 @@ class User
     {
         $this->categories = new ArrayCollection();
         $this->transactions = new ArrayCollection();
+        $this->setTwoFactor(false);
     }
 
     public function getId(): int
@@ -128,8 +132,13 @@ class User
 
     public function hasTwoFactorAuthEnabled()
     {
-        // TODO:
+        return $this->twoFactor;
+    }
 
-        return true;
+    public function setTwoFactor(bool $twoFactor): User
+    {
+        $this->twoFactor = $twoFactor;
+
+        return $this;
     }
 }

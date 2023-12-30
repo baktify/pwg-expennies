@@ -5,7 +5,9 @@ declare(strict_types=1);
 use App\Controllers\AuthController;
 use App\Controllers\CategoryController;
 use App\Controllers\HomeController;
+use App\Controllers\ProfileController;
 use App\Controllers\ReceiptController;
+use App\Controllers\PasswordResetController;
 use App\Controllers\SeedController;
 use App\Controllers\TestController;
 use App\Controllers\TransactionController;
@@ -29,6 +31,8 @@ return function (App $app) {
         $guest->post('/login/two-factor', [AuthController::class, 'loginTwoFactor']);
         $guest->get('/register', [AuthController::class, 'registerView']);
         $guest->post('/register', [AuthController::class, 'register']);
+        $guest->get('/forgot-password', [PasswordResetController::class, 'showForgotPasswordForm']);
+        $guest->post('/forgot-password', [PasswordResetController::class, 'handleForgotPasswordRequest']);
     })->add(GuestMiddleware::class);
 
     $app->group('', function (RouteCollectorProxy $group) {
@@ -69,6 +73,11 @@ return function (App $app) {
             $transactions->put('/{transaction}/receipts', [ReceiptController::class, 'store']);
             $transactions->get('/{transaction}/receipts/{receipt}', [ReceiptController::class, 'download']);
             $transactions->delete('/{transaction}/receipts/{receipt}', [ReceiptController::class, 'delete']);
+        });
+
+        $group->group('/profile', function (RouteCollectorProxy $profile) {
+            $profile->get('', [ProfileController::class, 'index']);
+            $profile->put('', [ProfileController::class, 'update']);
         });
     })
         ->add(VerifyEmailMiddleware::class)

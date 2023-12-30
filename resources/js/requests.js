@@ -8,6 +8,22 @@ const axe = axios.create({
     }
 })
 
+export const saveProfile = async (formData, parentDom) => {
+    try {
+        // clearErrors(parentDom)
+
+        const {status, data} = await axe.post('/profile', {
+            _METHOD: 'PUT',
+            ...formData,
+            ...getCsrfFields(),
+        })
+
+        return {status, data}
+    } catch ({status, response: {data: errors}}) {
+        // handleErrors(errors, parentDom)
+    }
+}
+
 export const twoFactorLogIn = async (formData, parentDom) => {
     try {
         clearErrors(parentDom)
