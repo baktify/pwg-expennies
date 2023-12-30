@@ -131,6 +131,7 @@ class Auth implements AuthInterface
 
         if ($status === AuthAttemptStatus::SUCCESS) {
             $this->userLoginCodeService->deactivateAllActiveCodes($user);
+            $this->session->forget('2FA');
         }
 
         return $status;
