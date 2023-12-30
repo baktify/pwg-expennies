@@ -1,5 +1,14 @@
 {% extends 'auth/layout.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('auth') }}
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('auth') }}
+{% endblock %}
+
 {% block title %}Log In{% endblock %}
 
 {% block content %}

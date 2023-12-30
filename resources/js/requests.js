@@ -8,6 +8,38 @@ const axe = axios.create({
     }
 })
 
+export const updatePassword = async (endpoint, formData, parentDom) => {
+    try {
+        clearErrors(parentDom)
+
+        const {status } = await axe.post(endpoint, {
+            ...formData,
+            ...getCsrfFields()
+        })
+
+        return {status}
+    } catch ({response: {status, data: errors}}) {
+        handleErrors(errors, parentDom)
+
+        return {status};
+    }
+}
+
+export const requestPasswordReset = async (formData, parentDom) => {
+    try {
+        clearErrors(parentDom)
+
+        const {status} = await axe.post(`/forgot-password`, {
+            ...formData,
+            ...getCsrfFields(),
+        })
+
+        return {status};
+    } catch ({response: {data: errors}}) {
+        handleErrors(errors, parentDom)
+    }
+}
+
 export const saveProfile = async (formData, parentDom) => {
     try {
         // clearErrors(parentDom)
@@ -100,7 +132,7 @@ export const uploadTransactionReceipts = async (transactionId, receipts, parentD
     try {
         clearErrors(parentDom)
 
-        const response = await axe.post(`/transactions/${transactionId}/receipts`, {
+        return await axe.post(`/transactions/${transactionId}/receipts`, {
             ...getCsrfFields(),
             receipts: receipts,
             _METHOD: 'PUT'
@@ -110,7 +142,6 @@ export const uploadTransactionReceipts = async (transactionId, receipts, parentD
             }
         })
 
-        return response
     } catch ({response: {status, data: errors}}) {
         handleErrors(errors, parentDom)
     }
@@ -249,11 +280,12 @@ const handleErrors = (errors, domElement) => {
         const inputParent = input.parentElement
         input.classList.add('is-invalid')
 
-        for (const message of errors[error]) {
-            const errorDiv = `<div class="invalid-feedback">${message}</div>`
+        // for (const message of errors[error]) {
+        const message = errors[error];
+        const errorDiv = `<div class="invalid-feedback">${message}</div>`
 
-            inputParent.innerHTML += errorDiv
-        }
+        inputParent.innerHTML += errorDiv
+        // }
     }
 }
 

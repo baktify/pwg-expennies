@@ -3,6 +3,7 @@
 namespace App\Middlewares;
 
 use App\Config;
+use App\Exceptions\InvalidLinkException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -21,7 +22,6 @@ class ValidateSignatureMiddleware implements MiddlewareInterface
         $queryParams = $request->getQueryParams();
         $timestamp = (int) ($queryParams['expiration'] ?? 0);
         $signature = $queryParams['signature'] ?? '';
-
         unset($queryParams['signature']);
 
         $signatureCompare = hash_hmac(
@@ -31,7 +31,7 @@ class ValidateSignatureMiddleware implements MiddlewareInterface
         );
 
         if (!hash_equals($signature, $signatureCompare) || $timestamp <= time()) {
-            throw new \RuntimeException('Verification link is invalid');
+            throw new InvalidLinkException('Invalid link');
         }
 
         return $handler->handle($request);

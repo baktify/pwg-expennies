@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Contracts\EntityManagerServiceInterface;
@@ -27,7 +29,7 @@ class UserService
         $user = new User();
         $user->setEmail($data->email);
         $user->setName($data->name);
-        $user->setPassword(password_hash($data->password, PASSWORD_BCRYPT, ['cost' => 12]));
+        $user->setPassword($this->hash_password($data->password));
 
         $this->entityManagerService->persist($user);
         $this->entityManagerService->flush();
@@ -39,5 +41,24 @@ class UserService
     {
         $user->setVerifiedAt(new \DateTime());
         $this->entityManagerService->sync();
+    }
+
+    public function updatePassword(User $user, string $password): User
+    {
+        $user->setPassword($this->hash_password($password));
+
+        return $user;
+    }
+
+    public function hash_password(string $password)
+    {
+        return password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+    }
+
+    public function checkPasswordMatch(User $user, string $password): bool
+    {
+        $userCurrentPassword = $user->getPassword();
+
+        return password_verify($password, $userCurrentPassword);
     }
 }

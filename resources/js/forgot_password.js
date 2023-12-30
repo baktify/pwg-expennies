@@ -1,37 +1,45 @@
-import { post } from './ajax';
+import {requestPasswordReset, updatePassword} from "./requests";
 
-window.addEventListener('DOMContentLoaded', function () {
+const init = () => {
     const forgotPasswordBtn = document.querySelector('.forgot-password-btn')
-    const resetPasswordBtn  = document.querySelector('.reset-password-btn')
+    const resetPasswordBtn = document.querySelector('.reset-password-btn')
 
     if (forgotPasswordBtn) {
-        forgotPasswordBtn.addEventListener('click', function () {
-            const form  = document.querySelector('.forgot-password-form')
-            const email = form.querySelector('input[name="email"]').value
+        const form = forgotPasswordBtn.closest('form')
 
-            post('/forgot-password', {email}, form).then(response => {
-                if (response.ok) {
-                    alert('An email with instructions to reset your password has been sent.');
+        const onSubmitForgotPasswordForm = (e) => {
+            e.preventDefault()
 
-                    window.location = '/login'
+            const formData = Object.fromEntries(new FormData(form))
+
+            requestPasswordReset(formData, form).then(({status}) => {
+                if (status) {
+                    alert('An email with instructions to reset your password has been sent.')
                 }
+
+                window.location = '/login'
             })
-        })
+        }
+
+        form.addEventListener('submit', onSubmitForgotPasswordForm)
     }
 
     if (resetPasswordBtn) {
-        resetPasswordBtn.addEventListener('click', function () {
-            const form     = this.closest('form')
-            const formData = new FormData(form);
-            const data     = Object.fromEntries(formData.entries());
+        const onClickResetPasswordBtn = () => {
+            const form = resetPasswordBtn.closest('form')
+            const formData = Object.fromEntries(new FormData(form));
 
-            post(form.action, data, form).then(response => {
-                if (response.ok) {
-                    alert('Password has been updated successfully.');
+            updatePassword(form.action, formData, form).then(({status}) => {
+                if (status) {
+                    alert('You password has been updated. You will be redirected to login page')
 
-                    window.location = '/login'
+                    window.location = '/'
                 }
             })
-        })
+        }
+
+        resetPasswordBtn.addEventListener('click', onClickResetPasswordBtn)
     }
-})
+}
+
+document.addEventListener('DOMContentLoaded', init)

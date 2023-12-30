@@ -6,8 +6,12 @@ namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\UserProfileData;
+use App\Exceptions\ValidationException;
+use App\RequestValidators\PasswordResetRequestValidator;
+use App\RequestValidators\PasswordUpdateRequestValidator;
 use App\RequestValidators\ProfileUpdateRequestValidator;
 use App\Services\UserProfileService;
+use App\Services\UserService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\Twig;
@@ -17,7 +21,8 @@ class ProfileController
     public function __construct(
         private readonly Twig                             $twig,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
-        private readonly UserProfileService               $userProfileService
+        private readonly UserProfileService               $userProfileService,
+        private readonly UserService                      $userService,
     )
     {
     }
@@ -46,6 +51,30 @@ class ProfileController
             $data['name'],
             (bool)($data['twoFactor'] ?? false)
         ));
+
+        return $response;
+    }
+
+    public function updatePassword(Request $request, Response $response): Response
+    {
+        $data = $this->requestValidatorFactory->make(PasswordUpdateRequestValidator::class)->validate(
+            $request->getParsedBody()
+        );
+
+        $user = $request->getAttribute('user');
+        if (!$user) {
+            $response->getBody()->write('Unauthorized');
+
+            return $response->withStatus(401);
+        }
+
+        // Check if current password matches
+        $password = $data['currentPassword'];
+        if (!$this->userService->checkPasswordMatch($user, $password)) {
+            throw new ValidationException(['currentPassword' => ['Incorrect current password']]);
+        }
+
+        $this->userService->updatePassword($user, $password);
 
         return $response;
     }
