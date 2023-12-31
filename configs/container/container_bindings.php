@@ -15,6 +15,7 @@ use App\Enums\AppEnvironment;
 use App\Enums\SameSite;
 use App\Enums\StorageDriver;
 use App\Filters\UserFilter;
+use App\RedisCache;
 use App\RequestValidators\RequestValidatorFactory;
 use App\Services\EntityManagerService;
 use App\Session;
@@ -29,6 +30,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\SimpleCache\CacheInterface;
 use Slim\App;
 use Slim\Csrf\Guard;
 use Slim\Factory\AppFactory;
@@ -144,4 +146,13 @@ return [
     },
     BodyRendererInterface::class => fn(Twig $twig) => new BodyRenderer($twig->getEnvironment()),
     RouteParserInterface::class => fn(App $app) => $app->getRouteCollector()->getRouteParser(),
+    CacheInterface::class => function (Config $config) {
+        $redisConfigs = $config->get('redis');
+
+        $redis = new Redis();
+        $redis->connect($redisConfigs['host'], (int) $redisConfigs['port']);
+        $redis->auth($redisConfigs['password']);
+
+        return new RedisCache($redis);
+    },
 ];

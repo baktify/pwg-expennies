@@ -13,7 +13,6 @@ use App\Services\CategoryService;
 use App\Services\TransactionService;
 use App\Services\UserLoginCodeService;
 use App\Services\UserService;
-use Cassandra\Date;
 use Clockwork\Clockwork;
 use Clockwork\DataSource\DoctrineDataSource;
 use Clockwork\Request\LogLevel;
@@ -42,11 +41,8 @@ class TestController
 
     public function test(Request $request, Response $response): Response
     {
-        $user = $this->userService->find(1);
 
-        $this->userLoginCodeService->deactivateAllActiveCodes($user);
 
-        echo 123;
         return $response;
     }
 }
