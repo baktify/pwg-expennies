@@ -41,6 +41,8 @@ use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Mailer;
@@ -153,6 +155,8 @@ return [
         $redis->connect($redisConfigs['host'], (int) $redisConfigs['port']);
         $redis->auth($redisConfigs['password']);
 
-        return new RedisCache($redis);
+        $adapter = new RedisAdapter($redis);
+
+        return new Psr16Cache($adapter);
     },
 ];
