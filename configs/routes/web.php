@@ -28,12 +28,15 @@ return function (App $app) {
 
     $app->group('', function (RouteCollectorProxy $guest) {
         $guest->get('/login', [AuthController::class, 'loginView']);
-        $guest->post('/login', [AuthController::class, 'logIn'])->add(RateLimitMiddleware::class);
+        $guest->post('/login', [AuthController::class, 'logIn'])->setName('logIn')
+            ->add(RateLimitMiddleware::class);
         $guest->post('/login/two-factor', [AuthController::class, 'loginTwoFactor']);
         $guest->get('/register', [AuthController::class, 'registerView']);
-        $guest->post('/register', [AuthController::class, 'register']);
+        $guest->post('/register', [AuthController::class, 'register'])->setName('register')
+            ->add(RateLimitMiddleware::class);
         $guest->get('/forgot-password', [PasswordResetController::class, 'showForgotPasswordForm']);
-        $guest->post('/forgot-password', [PasswordResetController::class, 'handleForgotPasswordRequest']);
+        $guest->post('/forgot-password', [PasswordResetController::class, 'handleForgotPasswordRequest'])
+            ->setName('forgotPassword')->add(RateLimitMiddleware::class);
         $guest->get('/reset-password/{token}', [PasswordResetController::class, 'showResetPasswordForm'])
             ->setName('reset-password')->add(ValidateSignatureMiddleware::class);
         $guest->post('/reset-password/{token}', [PasswordResetController::class, 'handleResetPasswordRequest']);
@@ -42,11 +45,10 @@ return function (App $app) {
     $app->group('', function (RouteCollectorProxy $group) {
         $group->get('/verify', [VerificationController::class, 'index']);
         $group->get('/verify/{userId}/{emailHash}', [VerificationController::class, 'verify'])
-            ->setName('verify')->add(ValidateSignatureMiddleware::class);
-        $group->get('/resend-verification', [VerificationController::class, 'resendVerification']);
-    })
-        ->add(RedirectVerifiedUserMiddleware::class)
-        ->add(AuthMiddleware::class);
+            ->setName('verify')->add(ValidateSignatureMiddleware::class)->add(RateLimitMiddleware::class);
+        $group->get('/resend-verification', [VerificationController::class, 'resendVerification'])
+            ->setName('resendVerification')->add(RateLimitMiddleware::class);
+    })->add(RedirectVerifiedUserMiddleware::class)->add(AuthMiddleware::class);
 
     $app->group('', function (RouteCollectorProxy $group) {
         $group->post('/logout', [AuthController::class, 'logOut']);
@@ -84,7 +86,5 @@ return function (App $app) {
             $profile->put('', [ProfileController::class, 'update']);
             $profile->put('/update-password', [ProfileController::class, 'updatePassword']);
         });
-    })
-        ->add(VerifyEmailMiddleware::class)
-        ->add(AuthMiddleware::class);
+    })->add(VerifyEmailMiddleware::class)->add(AuthMiddleware::class);
 };
