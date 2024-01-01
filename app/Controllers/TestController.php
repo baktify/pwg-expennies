@@ -41,7 +41,7 @@ class TestController
 
     public function test(Request $request, Response $response): Response
     {
-
+        dd($request->getServerParams());
 
         return $response;
     }

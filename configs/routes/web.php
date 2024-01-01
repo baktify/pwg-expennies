@@ -15,6 +15,7 @@ use App\Controllers\VerificationController;
 use App\Middlewares\AuthMiddleware;
 use App\Middlewares\GuestMiddleware;
 use App\EntityBindingRouteStrategy;
+use App\Middlewares\RateLimitMiddleware;
 use App\Middlewares\RedirectVerifiedUserMiddleware;
 use App\Middlewares\ValidateSignatureMiddleware;
 use App\Middlewares\VerifyEmailMiddleware;
@@ -27,7 +28,7 @@ return function (App $app) {
 
     $app->group('', function (RouteCollectorProxy $guest) {
         $guest->get('/login', [AuthController::class, 'loginView']);
-        $guest->post('/login', [AuthController::class, 'logIn']);
+        $guest->post('/login', [AuthController::class, 'logIn'])->add(RateLimitMiddleware::class);
         $guest->post('/login/two-factor', [AuthController::class, 'loginTwoFactor']);
         $guest->get('/register', [AuthController::class, 'registerView']);
         $guest->post('/register', [AuthController::class, 'register']);

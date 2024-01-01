@@ -15,7 +15,7 @@ class RequestService
     public function getReferer(ServerRequestInterface $request)
     {
         $referer = $request->getHeader('referer')[0] ?? '';
-        
+
         if (!$referer) {
             $referer = $this->session->get('previousUrl');
         }
@@ -48,5 +48,20 @@ class RequestService
             $orderDir,
             $params['search']['value'],
         );
+    }
+
+    public function getClientIp(ServerRequestInterface $request, array $trustedProxies): ?string
+    {
+        $serverParams = $request->getServerParams();
+        $clientIp = $serverParams['REMOTE_ADDR'];
+
+        if (in_array($clientIp, $trustedProxies, true)
+            && isset($serverParams['HTTP_X_FORWARDED_FOR'])) {
+            $ips = explode(',', $serverParams['HTTP_X_FORWARDED_FOR']);
+
+            return trim($ips[0]);
+        }
+
+        return $clientIp ?? null;
     }
 }

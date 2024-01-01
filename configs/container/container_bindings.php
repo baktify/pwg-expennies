@@ -155,7 +155,7 @@ return [
         $redis->connect($redisConfigs['host'], (int) $redisConfigs['port']);
         $redis->auth($redisConfigs['password']);
 
-        return new RedisCache($redis);
+//        return new RedisCache($redis);
         $adapter = new RedisAdapter($redis);
 
         return new Psr16Cache($adapter);
