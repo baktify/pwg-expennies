@@ -43,8 +43,8 @@ class RedisCache implements CacheInterface
         $values = $this->redis->mGet((array)$keys);
         $result = [];
 
-        foreach ($values as $i => $value) {
-            $result[$keys[$i]] = $value === false ? $default : $value;
+        foreach ($values as $key => $value) {
+            $result[$keys[$key]] = $value === false ? $default : $value;
         }
 
         return $result;
