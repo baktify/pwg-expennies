@@ -26,9 +26,9 @@ class RateLimitMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $cacheKey = $this->requestService->getClientIp($request, $this->config->get('trusted_proxies'));
+        $clientIp = $this->requestService->getClientIp($request, $this->config->get('trusted_proxies'));
         $routeName = RouteContext::fromRequest($request)->getRoute()->getName();
-        $limiter = $this->rateLimiterFactory->create($routeName . '_' . $cacheKey);
+        $limiter = $this->rateLimiterFactory->create($routeName . '_' . $clientIp);
 
         if ($limiter->consume()->isAccepted() === false) {
             return $this->responseFactory->createResponse(429, 'Too many requests');
