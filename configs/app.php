@@ -39,7 +39,15 @@ return [
         'samesite' => SameSite::Lax,
     ],
     'storage' => [
-        'driver' => StorageDriver::Local,
+        'driver' => StorageDriver::Remote_TW,
+        's3' => [
+            'access_key' => $_ENV['AWS_ACCESS_KEY'],
+            'secret' => $_ENV['AWS_SECRET'],
+            'endpoint' => $_ENV['AWS_ENDPOINT'],
+            'region' => $_ENV['AWS_REGION'],
+            'version' => $_ENV['AWS_VERSION'],
+            'bucket' => $_ENV['AWS_BUCKET'],
+        ],
     ],
     'mailer' => [
         'dsn'   => $_ENV['MAILER_DSN'],

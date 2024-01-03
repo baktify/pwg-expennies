@@ -130,8 +130,22 @@ return [
         $responseFactory, failureHandler: $csrf->failureHandler(), persistentTokenMode: true
     ),
     Filesystem::class => function (Config $config) {
+        $timeWeb = function ($options) {
+            $credentials = new Aws\Credentials\Credentials($options['access_key'], $options['secret']);
+
+            $client = new Aws\S3\S3Client([
+                'credentials' => $credentials,
+                'endpoint' => $options['endpoint'],
+                'region' => $options['region'],
+                'version' => $options['version'],
+            ]);
+
+            return new League\Flysystem\AwsS3V3\AwsS3V3Adapter($client, $options['bucket']);
+        };
+
         $adapter = match ($config->get('storage.driver')) {
             StorageDriver::Local => new LocalFilesystemAdapter(STORAGE_PATH),
+            StorageDriver::Remote_TW => $timeWeb($config->get('storage.s3')),
         };
 
         return new Filesystem($adapter);
@@ -154,7 +168,7 @@ return [
         $redisConfigs = $config->get('redis');
 
         $redis = new Redis();
-        $redis->connect($redisConfigs['host'], (int) $redisConfigs['port']);
+        $redis->connect($redisConfigs['host'], (int)$redisConfigs['port']);
         $redis->auth($redisConfigs['password']);
 
         return new RedisAdapter($redis);
