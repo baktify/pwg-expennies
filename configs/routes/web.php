@@ -55,10 +55,10 @@ return function (App $app) {
     })->add(AuthMiddleware::class);
 
     $app->group('', function (RouteCollectorProxy $group) {
-        $group->get('/', [HomeController::class, 'index']);
+        $group->get('/', [HomeController::class, 'index'])->setName('dashboard');
 
         $group->group('/categories', function (RouteCollectorProxy $categories) {
-            $categories->get('', [CategoryController::class, 'index']);
+            $categories->get('', [CategoryController::class, 'index'])->setName('category.index');
             $categories->get('/list', [CategoryController::class, 'list']);
             $categories->get('/load', [CategoryController::class, 'load']);
             $categories->post('', [CategoryController::class, 'store']);
@@ -68,7 +68,7 @@ return function (App $app) {
         });
 
         $group->group('/transactions', function (RouteCollectorProxy $transactions) {
-            $transactions->get('', [TransactionController::class, 'index']);
+            $transactions->get('', [TransactionController::class, 'index'])->setName('transaction.index');
             $transactions->get('/load', [TransactionController::class, 'load']);
             $transactions->post('', [TransactionController::class, 'store']);
             $transactions->post('/upload-from-csv', [TransactionController::class, 'uploadFromCsv']);
@@ -76,7 +76,7 @@ return function (App $app) {
             $transactions->delete('/{transaction}', [TransactionController::class, 'delete']);
             $transactions->put('/{transaction}', [TransactionController::class, 'update']);
             $transactions->put('/{transaction}/toggle-review', [TransactionController::class, 'toggleReview']);
-            $transactions->put('/{transaction}/receipts', [ReceiptController::class, 'store']);
+            $transactions->post('/{transaction}/receipts', [ReceiptController::class, 'store']);
             $transactions->get('/{transaction}/receipts/{receipt}', [ReceiptController::class, 'download']);
             $transactions->delete('/{transaction}/receipts/{receipt}', [ReceiptController::class, 'delete']);
         });

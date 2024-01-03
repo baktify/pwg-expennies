@@ -53,6 +53,12 @@ return [
         'dsn'   => $_ENV['MAILER_DSN'],
         'from'  => $_ENV['MAILER_FROM'],
     ],
+    'rate_limiter' => [
+        'id' => 'default',
+        'policy' => 'fixed_window',
+        'interval' => '60 seconds',
+        'limit' => 3,
+    ],
     'redis' => [
         'host' => $_ENV['REDIS_HOST'],
         'port' => $_ENV['REDIS_PORT'],

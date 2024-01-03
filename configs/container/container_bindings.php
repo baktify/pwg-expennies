@@ -67,6 +67,7 @@ return [
         );
 
         $addMiddlewares($app);
+
         $router($app);
 
         return $app;
@@ -176,13 +177,8 @@ return [
     CacheInterface::class => function (RedisAdapter $redisAdapter) {
         return new Psr16Cache($redisAdapter);
     },
-    RateLimiterFactory::class => function (RedisAdapter $redisAdapter) {
-        $rateLimiterConfig = [
-            'id' => 'default',
-            'policy' => 'fixed_window',
-            'interval' => '60 seconds',
-            'limit' => 3,
-        ];
+    RateLimiterFactory::class => function (RedisAdapter $redisAdapter, Config $config) {
+        $rateLimiterConfig = $config->get('rate_limiter');
         $storage = new CacheStorage($redisAdapter);
 
         return new RateLimiterFactory($rateLimiterConfig, $storage);

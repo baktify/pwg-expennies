@@ -12,7 +12,7 @@ export const updatePassword = async (endpoint, formData, parentDom) => {
     try {
         clearErrors(parentDom)
 
-        const {status } = await axe.post(endpoint, {
+        const {status} = await axe.post(endpoint, {
             ...formData,
             ...getCsrfFields()
         })
@@ -120,9 +120,13 @@ export const uploadCsvTransactions = async (csvFile, parentDom) => {
 }
 
 export const deleteTransactionReceipt = async (transactionId, receiptId) => {
-    const {status, data} = await axe.post(`/transactions/${transactionId}/receipts/${receiptId}`, {
-        ...getCsrfFields(),
-        _METHOD: 'DELETE'
+
+    const {status, data} = await axe.request({
+        url: `/transactions/${transactionId}/receipts/${receiptId}`,
+        method: 'DELETE',
+        data: {
+            ...getCsrfFields(),
+        }
     })
 
     return {status, data}
@@ -134,14 +138,12 @@ export const uploadTransactionReceipts = async (transactionId, receipts, parentD
 
         return await axe.post(`/transactions/${transactionId}/receipts`, {
             ...getCsrfFields(),
-            receipts: receipts,
-            _METHOD: 'PUT'
+            receipts,
         }, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             }
         })
-
     } catch ({response: {status, data: errors}}) {
         handleErrors(errors, parentDom)
     }
@@ -176,13 +178,14 @@ export const getTransaction = async (transactionId, parentDom) => {
 }
 
 export const deleteTransaction = async (transactionId) => {
-    await axe.post(`/transactions/${transactionId}`, {
-        ...getCsrfFields()
-    }, {
-        headers: {
-            'X-Http-Method-Override': 'DELETE'
-        }
-    });
+    const {status} = await axe.request({
+        url: `/transactions/${transactionId}`,
+        method: 'DELETE',
+        data: {
+            ...getCsrfFields()
+        },
+    })
+    return {status}
 }
 
 export const createTransaction = async (transaction, parentDom) => {
@@ -252,13 +255,14 @@ export const updateCategory = async (id, newName, domElement) => {
 }
 
 export const deleteCategory = async (id) => {
-    await axe.post(`/categories/${id}`, {
-        ...getCsrfFields(),
-    }, {
-        headers: {
-            'X-Http-Method-Override': 'DELETE'
+    const {status} = await axe.request({
+        url: `/categories/${id}`,
+        method: 'DELETE',
+        data: {
+            ...getCsrfFields(),
         }
     })
+    return {status}
 }
 
 /** Error handlers and CSRF generator */

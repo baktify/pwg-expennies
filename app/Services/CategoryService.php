@@ -36,20 +36,12 @@ class CategoryService
 
     public function getAllKeyedWithNameArray(): array
     {
-        $cacheKey = 'keyed_with_name_array_categories_' . $userId;
-
-        if ($this->cache->has($cacheKey)) {
-            return $this->cache->get($cacheKey);
-        }
-
         $categories = $this->getAll();
         $categoriesMap = [];
 
         foreach ($categories as $category) {
             $categoriesMap[strtolower($category->getName())] = $category;
         }
-
-        $this->cache->set($cacheKey, $categoriesMap);
 
         return $categoriesMap;
     }

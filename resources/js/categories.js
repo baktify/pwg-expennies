@@ -55,7 +55,13 @@ window.addEventListener('DOMContentLoaded', function () {
             const categoryId = deleteBtn.getAttribute('data-id')
 
             if (confirm(`Do you want to delete category ${categoryId}?`)) {
-                deleteCategory(categoryId).then(() => table.draw())
+                deleteCategory(categoryId).then(({status}) => {
+                    if (status === 200) {
+                        table.draw()
+                    } else {
+                        alert('Something went wrong')
+                    }
+                })
             }
         }
     })

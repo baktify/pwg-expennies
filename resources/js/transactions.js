@@ -60,7 +60,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const transactionId = deleteBtn.getAttribute('data-id')
 
             if (confirm('Are you sure to delete transaction with id ' + transactionId)) {
-                deleteTransaction(transactionId).then(() => table.draw())
+                deleteTransaction(transactionId).then(({status}) => {
+                    if (status === 200) {
+                        return table.draw()
+                    }
+                    alert('Something went wrong')
+                })
             }
         }
     }

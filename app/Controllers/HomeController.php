@@ -20,13 +20,6 @@ class HomeController
 
     public function index(Response $response): Response
     {
-        $this->cache->set('a', 10);
-        $this->cache->setMultiple(['b' => 20, 'c' => 30], 20);
-
-        dump(
-            $this->cache->getMultiple(['a', 'b', 'c']),
-        );
-
         return $this->twig->render($response, 'dashboard.twig');
     }
 }
