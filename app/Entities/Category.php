@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
+use Doctrine\ORM\Mapping\PostLoad;
 use Doctrine\ORM\Mapping\Table;
 
 #[Entity, Table('categories'), HasLifecycleCallbacks]
@@ -43,6 +44,12 @@ class Category implements OwnableInterface
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
+    }
+
+    #[PostLoad]
+    public function capitalizeName()
+    {
+        $this->setName(ucfirst($this->name));
     }
 
     public function getId(): int

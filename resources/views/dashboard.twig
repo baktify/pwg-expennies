@@ -37,6 +37,24 @@
                 </div>
                 <div class="row">
                     <div class="col p-4">
+                        <div>
+                            <p>Get stats by year</p>
+                            <form action="" method="GET">
+                                <select name="year">
+                                    <option value="2015">2015</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2018">2018</option>
+                                    <option value="2019">2019</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                                <button type="submit" class="select-year">Submit</button>
+                            </form>
+                        </div>
                         <div class="fs-1 text-center mb-2">{{ "now" | date('Y') }} Summary</div>
                         <canvas id="yearToDateChart"></canvas>
                     </div>
@@ -50,10 +68,10 @@
                         <tr>
                             <td>{{ transaction.description[0:20] }}</td>
                             <td class="{{ transaction.amount > 0 ? 'text-success fw-bold' : '' }}">
-                                {{ transaction.amount < 0 ? '-' : '' }}${{ transaction.amount | abs | number_format(2) }}
+                                {{ transaction.amount < 0 ? '-' : '' }}${{ transaction.amount | abs | number_format(2, '.', ',') }}
                             </td>
                             <td>
-                                <div>{{ transaction.category ? transaction.category.name : 'N/A' }}</div>
+                                <div>{{ transaction.categoryName | capitalize ?: 'N/A' }}</div>
                                 <div>{{ transaction.date | date('m/d/Y') }}</div>
                             </td>
                         </tr>
@@ -68,7 +86,7 @@
                     <div class="category-card p-4 text-center d-flex align-items-center justify-content-center">
                         <div>
                             <h6 class="fs-6 fw-normal">{{ spendingCategory.name }}</h6>
-                            <h1 class="fs-1 text-danger text-opacity-75">${{ spendingCategory.total }}</h1>
+                            <h1 class="fs-1 text-danger text-opacity-75">${{ spendingCategory.amount|abs }}</h1>
                         </div>
                     </div>
                 </div>

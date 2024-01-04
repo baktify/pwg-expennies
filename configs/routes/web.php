@@ -59,7 +59,7 @@ return function (App $app) {
         $group->get('/stats/ytd', [HomeController::class, 'getYearToDateStatistics']);
 
         $group->group('/categories', function (RouteCollectorProxy $categories) {
-            $categories->get('', [CategoryController::class, 'index'])->setName('category.index');
+            $categories->get('', [CategoryController::class, 'index'])->setName('categories.index');
             $categories->get('/list', [CategoryController::class, 'list']);
             $categories->get('/load', [CategoryController::class, 'load']);
             $categories->post('', [CategoryController::class, 'store']);
@@ -69,7 +69,7 @@ return function (App $app) {
         });
 
         $group->group('/transactions', function (RouteCollectorProxy $transactions) {
-            $transactions->get('', [TransactionController::class, 'index'])->setName('transaction.index');
+            $transactions->get('', [TransactionController::class, 'index'])->setName('transactions.index');
             $transactions->get('/load', [TransactionController::class, 'load']);
             $transactions->post('', [TransactionController::class, 'store']);
             $transactions->post('/upload-from-csv', [TransactionController::class, 'uploadFromCsv']);

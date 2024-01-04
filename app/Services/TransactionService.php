@@ -49,11 +49,11 @@ class TransactionService
     }
 
     public function create(
-        string        $description,
-        float         $amount,
-        DateTime      $date,
-        User $user,
-        ?Category     $category = null,
+        string    $description,
+        float     $amount,
+        DateTime  $date,
+        User      $user,
+        ?Category $category = null,
     ): Transaction
     {
         $transaction = new Transaction();
@@ -122,11 +122,6 @@ class TransactionService
         return $structure;
     }
 
-    public function getById(int $transactionId): ?Transaction
-    {
-        return $this->entityManager->getRepository(Transaction::class)->find($transactionId);
-    }
-
     public function update(Transaction $transaction, array $data, ?Category $category = null): Transaction
     {
         $transaction->setDescription($data['description']);
@@ -143,47 +138,74 @@ class TransactionService
         $transaction->setReviewed(!$transaction->isReviewed());
     }
 
-    private function getUniqueCategories(array $records): array
-    {
-        $categories = [];
-
-        /** @var CsvTransactionData $record */
-        foreach ($records as $record) {
-            $categories[] = $record->category;
-        }
-
-        $uniqueCategories = array_unique($categories);
-        $categoriesFiltered = array_filter($uniqueCategories, fn($category) => !empty(trim($category)));
-        $categoriesKeysToLower = array_map(fn($category) => strtolower($category), $categoriesFiltered);
-        $categoriesReindexed = array_values($categoriesKeysToLower);
-
-        return $categoriesReindexed;
-    }
-
     public function getTotals(\DateTime $startDate, \DateTime $endDate): array
     {
-        // TODO: Implement
+        $x = $this->entityManager->getRepository(Transaction::class)->createQueryBuilder('t')
+            ->select('t.amount')
+            ->getQuery()
+            ->getResult();
 
-        return ['net' => 800, 'income' => 3000, 'expense' => 2200];
+        $transactionAmounts = array_map(fn($item) => $item['amount'], $x);
+
+        $totals = ['income' => 0, 'expense' => 0, 'net' => 0];
+        foreach ($transactionAmounts as $amount) {
+            if ($amount < 0) {
+                $totals['expense'] += $amount;
+            } else {
+                $totals['income'] += $amount;
+            }
+            $totals['net'] += $amount;
+        }
+
+        return $totals;
     }
 
     public function getRecentTransactions(int $limit): array
     {
-        // TODO: Implement
-
-        return [];
+        return $this->entityManager->createQueryBuilder()
+            ->select('t.description', 't.amount', 't.date', 'c.name as categoryName')
+            ->from(Transaction::class, 't')
+            ->leftJoin('t.category', 'c')
+            ->setFirstResult(0)
+            ->setMaxResults($limit)
+            ->orderBy('t.date', 'DESC')
+            ->getQuery()->getResult();
     }
 
     public function getMonthlySummary(int $year): array
     {
-        // TODO: Implement
+        $query = $this->entityManager->createQueryBuilder()
+            ->select('t.amount', 't.date')
+            ->from(Transaction::class, 't');
 
-        return [
-            ['income' => 1500, 'expense' => 1100, 'm' => '3'],
-            ['income' => 2000, 'expense' => 1800, 'm' => '4'],
-            ['income' => 2500, 'expense' => 1900, 'm' => '5'],
-            ['income' => 2600, 'expense' => 1950, 'm' => '6'],
-            ['income' => 3000, 'expense' => 2200, 'm' => '7'],
-        ];
+        $transactionsResult = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $transactions = $query
+                ->where('MONTH(t.date) = :month', 'YEAR(t.date) = :year')
+                ->setParameter(':month', $i)
+                ->setParameter(':year', $year)
+                ->getQuery()->getResult();
+
+            $transactionsResult[] = ['m' => $i] + $this->getTotalsFrom($transactions);
+        }
+
+        return $transactionsResult;
+    }
+
+    public function getTotalsFrom(array $transactions): array
+    {
+        $totals = ['income' => 0, 'expense' => 0];
+
+        foreach ($transactions as $transaction) {
+            $amount = (float) $transaction['amount'];
+
+            if ($amount < 0) {
+                $totals['expense'] += abs($amount);
+            } else {
+                $totals['income'] += $amount;
+            }
+        }
+
+        return $totals;
     }
 }

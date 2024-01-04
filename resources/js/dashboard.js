@@ -1,17 +1,25 @@
 import "../css/dashboard.scss"
-import Chart   from 'chart.js/auto'
-import { get } from './ajax'
+import Chart from 'chart.js/auto'
+import {getOverallStats} from './requests'
 
-window.addEventListener('DOMContentLoaded', function () {
+const init = () => {
     const ctx = document.getElementById('yearToDateChart')
+    const selectYearBtn = document.querySelector('.select-year')
+    const selectYearForm = selectYearBtn.closest('form')
 
-    get('/stats/ytd').then(response => response.json()).then(response => {
+    const onSubmitSelectYearForm = (event) => {
+        event.preventDefault()
+
+
+    }
+
+    const overallStatsHandler = ({status, data}) => {
         let expensesData = Array(12).fill(null)
-        let incomeData   = Array(12).fill(null)
+        let incomeData = Array(12).fill(null)
 
-        response.forEach(({m, expense, income}) => {
+        data.forEach(({m, expense, income}) => {
             expensesData[m - 1] = expense
-            incomeData[m - 1]   = income
+            incomeData[m - 1] = income
         })
 
         new Chart(ctx, {
@@ -43,5 +51,11 @@ window.addEventListener('DOMContentLoaded', function () {
                 }
             }
         })
-    })
-})
+    }
+
+    getOverallStats().then(overallStatsHandler)
+
+    selectYearForm.addEventListener('submit', onSubmitSelectYearForm)
+}
+
+document.addEventListener('DOMContentLoaded', init)

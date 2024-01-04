@@ -8,6 +8,12 @@ const axe = axios.create({
     }
 })
 
+export const getOverallStats = async () => {
+    const {status, data} = await axe.get(`/stats/ytd`)
+
+    return {status, data}
+}
+
 export const updatePassword = async (endpoint, formData, parentDom) => {
     try {
         clearErrors(parentDom)

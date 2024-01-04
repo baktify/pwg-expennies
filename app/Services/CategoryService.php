@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\EntityManagerServiceInterface;
+use App\Entities\Transaction;
 use App\Entities\User;
 use App\DataObjects\DataTableQueryParamsData;
 use App\Entities\Category;
@@ -49,11 +50,6 @@ class CategoryService
     public function getById(int $id): ?Category
     {
         return $this->entityManager->getRepository(Category::class)->find($id);
-    }
-
-    public function getByName(string $name): ?Category
-    {
-        return $this->entityManager->getRepository(Category::class)->findOneBy(['name' => $name]);
     }
 
     public function update(Category $category, string $name): Category
@@ -102,26 +98,34 @@ class CategoryService
         };
     }
 
-    public function getByNameOrNew(string $categoryName, User $user): ?Category
-    {
-        $category = $this->getByName($categoryName);
-
-        if (!$category && !empty($categoryName)) {
-            $category = $this->create($categoryName, $user);
-        }
-
-        return $category;
-    }
-
     public function getTopSpendingCategories(int $limit): array
     {
-        // TODO: Implement
+        // Get all categories with transactions
+        $categories = $this->entityManager->createQueryBuilder()
+            ->select('c', 't')
+            ->from(Category::class, 'c')
+            ->join('c.transactions', 't')
+            ->getQuery()
+            ->getResult();
 
-        return [
-            ['name' => 'Category 1', 'total' => 700],
-            ['name' => 'Category 2', 'total' => 550],
-            ['name' => 'Category 3', 'total' => 475],
-            ['name' => 'Category 4', 'total' => 325],
-        ];
+        // Foreach category in categories -> calculate transactions expense
+        $categoriesResult = [];
+        for ($i = 0; $i < count($categories); $i++) {
+
+            /** @var Category $category */
+            $category = $categories[$i];
+            $categoriesResult[$i]['name'] = $category->getName();
+            $categoriesResult[$i]['amount'] = 0;
+
+            /** @var Transaction $transaction */
+            foreach ($category->getTransactions() as $transaction) {
+                $categoriesResult[$i]['amount'] += $transaction->getAmount();
+            }
+        }
+
+        // Sort categories
+        uasort($categoriesResult, fn ($a, $b) => $a['amount'] <=> $b['amount']);
+
+        return array_slice($categoriesResult, 0, $limit);
     }
 }
