@@ -26,6 +26,9 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMSetup;
+use DoctrineExtensions\Query\Mysql\DateFormat;
+use DoctrineExtensions\Query\Mysql\Month;
+use DoctrineExtensions\Query\Mysql\Year;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Psr\Container\ContainerInterface;
@@ -82,6 +85,18 @@ return [
             $config->get('doctrine.dev_mode')
         );
         $ORMConfig->addFilter('user', UserFilter::class);
+
+        if (class_exists('DoctrineExtensions\Query\Mysql\Year')) {
+            $ORMConfig->addCustomDatetimeFunction('YEAR', Year::class);
+        }
+
+        if (class_exists('DoctrineExtensions\Query\Mysql\Month')) {
+            $ORMConfig->addCustomDatetimeFunction('MONTH', Month::class);
+        }
+
+        if (class_exists('DoctrineExtensions\Query\Mysql\DateFormat')) {
+            $ORMConfig->addCustomStringFunction('DATE_FORMAT', DateFormat::class);
+        }
 
         return new EntityManager($connection, $ORMConfig);
     },

@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 ARG USER
 ARG USER_ID
@@ -31,7 +31,7 @@ COPY xdebug.ini "${PHP_INI_DIR}/conf.d"
 # install it (which installs both `node` and `npm`)
 
 # Set this to any desired version
-ENV NODE_VERSION 16.18.1
+ENV NODE_VERSION 20.10.0
 # Can be anything, but this is a good default
 ENV NVM_DIR /usr/local/nvm
 # Must match one of the tag versions on https://github.com/nvm-sh/nvm/tags
