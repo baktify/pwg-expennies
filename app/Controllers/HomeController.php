@@ -37,9 +37,10 @@ class HomeController
         ]);
     }
 
-    public function getYearToDateStatistics(Response $response): Response
+    public function getYearToDateStatistics(Request $request, Response $response): Response
     {
-        $data = $this->transactionService->getMonthlySummary(2023);
+        $year = (int) $request->getParsedBody()['year'] ?: (int)date('Y');
+        $data = $this->transactionService->getMonthlySummary($year);
 
         return $this->responseFormatter->asJson($response, $data);
     }

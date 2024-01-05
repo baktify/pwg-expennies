@@ -56,7 +56,7 @@ return function (App $app) {
 
     $app->group('', function (RouteCollectorProxy $group) {
         $group->get('/', [HomeController::class, 'index'])->setName('dashboard');
-        $group->get('/stats/ytd', [HomeController::class, 'getYearToDateStatistics']);
+        $group->post('/stats/ytd', [HomeController::class, 'getYearToDateStatistics']);
 
         $group->group('/categories', function (RouteCollectorProxy $categories) {
             $categories->get('', [CategoryController::class, 'index'])->setName('categories.index');

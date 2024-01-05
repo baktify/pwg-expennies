@@ -10,7 +10,9 @@ const init = () => {
     const onSubmitSelectYearForm = (event) => {
         event.preventDefault()
 
+        let year = selectYearForm.elements.year.value
 
+        getOverallStats(year).then(overallStatsHandler)
     }
 
     const overallStatsHandler = ({status, data}) => {
@@ -22,7 +24,7 @@ const init = () => {
             incomeData[m - 1] = income
         })
 
-        new Chart(ctx, {
+        const chart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Dec'],
@@ -51,9 +53,11 @@ const init = () => {
                 }
             }
         })
+        chart.update()
     }
 
-    getOverallStats().then(overallStatsHandler)
+    let year = new Date().getFullYear()
+    getOverallStats(year).then(overallStatsHandler)
 
     selectYearForm.addEventListener('submit', onSubmitSelectYearForm)
 }

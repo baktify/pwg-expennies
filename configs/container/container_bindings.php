@@ -169,7 +169,7 @@ return [
     Clockwork::class => function (EntityManagerInterface $em) {
         $clockwork = new Clockwork();
         $clockwork->setStorage(new FileStorage(STORAGE_PATH . '/clockwork'));
-        $clockwork->addDataSource(new DoctrineDataSource($em));
+//        $clockwork->addDataSource(new DoctrineDataSource($em));
 
         return $clockwork;
     },

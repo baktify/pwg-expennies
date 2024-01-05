@@ -8,8 +8,15 @@ const axe = axios.create({
     }
 })
 
-export const getOverallStats = async () => {
-    const {status, data} = await axe.get(`/stats/ytd`)
+export const getOverallStats = async (year) => {
+    const {status, data} = await axe.request({
+        url: `/stats/ytd`,
+        method: 'POST',
+        data: {
+            ...getCsrfFields(),
+            year
+        },
+    })
 
     return {status, data}
 }
