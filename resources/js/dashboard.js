@@ -4,16 +4,6 @@ import {getOverallStats} from './requests'
 
 const init = () => {
     const ctx = document.getElementById('yearToDateChart')
-    const selectYearBtn = document.querySelector('.select-year')
-    const selectYearForm = selectYearBtn.closest('form')
-
-    const onSubmitSelectYearForm = (event) => {
-        event.preventDefault()
-
-        let year = selectYearForm.elements.year.value
-
-        getOverallStats(year).then(overallStatsHandler)
-    }
 
     const overallStatsHandler = ({status, data}) => {
         let expensesData = Array(12).fill(null)
@@ -58,8 +48,6 @@ const init = () => {
 
     let year = new Date().getFullYear()
     getOverallStats(year).then(overallStatsHandler)
-
-    selectYearForm.addEventListener('submit', onSubmitSelectYearForm)
 }
 
 document.addEventListener('DOMContentLoaded', init)

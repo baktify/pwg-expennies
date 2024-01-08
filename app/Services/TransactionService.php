@@ -149,30 +149,18 @@ class TransactionService
 
     public function getTotals(\DateTime $startDate, \DateTime $endDate): array
     {
-        $transactionsAmount = $this->entityManager->createQueryBuilder()
-            ->select('t.amount')
-            ->from(Transaction::class, 't')
-            ->where('t.date BETWEEN :startDate AND :endDate')
-            ->setParameters([
-                ':startDate' => $startDate,
-                ':endDate' => $endDate,
-            ])
-            ->getQuery()
-            ->getResult();
+        $query = $this->entityManager->createQuery('
+            SELECT  SUM(t.amount) as net,
+                    SUM(CASE WHEN t.amount < 0 THEN ABS(t.amount) ELSE 0 END) as expense,
+                    SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END) as income
+            FROM App\Entities\Transaction t
+            WHERE t.date BETWEEN :startDate AND :endDate
+        ');
 
-        $transactionsAmount = array_map(fn($item) => $item['amount'], $transactionsAmount);
+        $query->setParameter('startDate', $startDate->format('Y-m-d 00:00:00'));
+        $query->setParameter('endDate', $endDate->format('Y-m-d 23:59:59'));
 
-        $totals = ['income' => 0, 'expense' => 0, 'net' => 0];
-        foreach ($transactionsAmount as $amount) {
-            if ($amount < 0) {
-                $totals['expense'] += $amount;
-            } else {
-                $totals['income'] += $amount;
-            }
-            $totals['net'] += $amount;
-        }
-
-        return $totals;
+        return $query->getSingleResult();
     }
 
     public function getRecentTransactions(int $limit): array
@@ -182,45 +170,24 @@ class TransactionService
             ->from(Transaction::class, 't')
             ->leftJoin('t.category', 'c')
             ->orderBy('t.date', 'DESC')
-            ->setFirstResult(0)
             ->setMaxResults($limit)
             ->getQuery()->getResult();
     }
 
     public function getMonthlySummary(int $year): array
     {
-        $query = $this->entityManager->createQueryBuilder()
-            ->select('t.amount', 't.date')
-            ->from(Transaction::class, 't');
+        $query = $this->entityManager->createQuery('
+            SELECT  SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END) as income,
+                    SUM(CASE WHEN t.amount < 0 THEN ABS(t.amount) ELSE 0 END) as expense,
+                    MONTH(t.date) as m
+            FROM App\Entities\Transaction t
+            WHERE YEAR(t.date) = :year
+            GROUP BY m
+            ORDER BY m ASC
+        ');
 
-        $transactionsResult = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $transactions = $query
-                ->where('MONTH(t.date) = :month', 'YEAR(t.date) = :year')
-                ->setParameter(':month', $i)
-                ->setParameter(':year', $year)
-                ->getQuery()->getResult();
+        $query->setParameter('year', 2023);
 
-            $transactionsResult[] = ['m' => $i] + $this->getTotalsFrom($transactions);
-        }
-
-        return $transactionsResult;
-    }
-
-    public function getTotalsFrom(array $transactions): array
-    {
-        $totals = ['income' => 0, 'expense' => 0];
-
-        foreach ($transactions as $transaction) {
-            $amount = (float)$transaction['amount'];
-
-            if ($amount < 0) {
-                $totals['expense'] += abs($amount);
-            } else {
-                $totals['income'] += $amount;
-            }
-        }
-
-        return $totals;
+        return $query->getResult();
     }
 }
