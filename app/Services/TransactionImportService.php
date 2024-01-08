@@ -10,6 +10,8 @@ use App\Exceptions\ValidationException;
 use Clockwork\Clockwork;
 use Clockwork\Request\LogLevel;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Csv\Reader;
+use League\Csv\Statement;
 
 class TransactionImportService
 {
@@ -22,8 +24,12 @@ class TransactionImportService
     {
     }
 
-    public function import(array $records): void
+    public function import(string $csvPath): void
     {
+        $csvFile = Reader::createFromPath($csvPath, 'r');
+        $csvFile->setHeaderOffset(0);
+        $records = Statement::create()->process($csvFile);
+
         try {
             $this->entityManager->wrapInTransaction(function (EntityManagerInterface $em) use ($records) {
                 $user = $this->auth->user();
@@ -34,8 +40,10 @@ class TransactionImportService
                 $count = 1;
                 $batch = 500;
 
-                /** @var CsvTransactionData $record */
                 foreach ($records as $record) {
+                    /** @var CsvTransactionData $record */
+                    $record = $this->formatCsvRecord($record);
+
                     $categoryFromCsv = strtolower($record->category);
 
                     if ($databaseCategories[$categoryFromCsv] ?? null) {
@@ -77,5 +85,25 @@ class TransactionImportService
         } catch (\Throwable $e) {
             throw new ValidationException(['csv' => ['Something went wrong, try again later', $e->getMessage()]]);
         }
+    }
+
+    private function formatCsvRecord($record): CsvTransactionData
+    {
+        $record = array_change_key_case($record);
+        [
+            'date' => $date,
+            'description' => $description,
+            'category' => $category,
+            'amount' => $amount
+        ] = $record;
+
+        $amount = str_replace(['$', ','], ['', ''], $amount);
+
+        return new CsvTransactionData(
+            new \DateTime($date),
+            $description,
+            $category,
+            (float)$amount
+        );
     }
 }

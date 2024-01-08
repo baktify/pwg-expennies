@@ -22,6 +22,7 @@ class TransactionService
     public function __construct(
         private readonly EntityManagerServiceInterface $entityManager,
         private readonly Clockwork                     $clockwork,
+        private readonly CacheInterface                $cache,
     )
     {
     }
@@ -67,8 +68,9 @@ class TransactionService
         $transaction->setAmount($amount);
         $transaction->setDate($date);
         $transaction->setUser($user);
-
         $transaction->setCategory($category);
+
+        $this->cache->clear();
 
         return $transaction;
     }
@@ -133,8 +135,9 @@ class TransactionService
         $transaction->setDescription($data['description']);
         $transaction->setAmount((float)$data['amount']);
         $transaction->setDate(new DateTime($data['date']));
-
         $transaction->setCategory($category);
+
+        $this->cache->clear();
 
         return $transaction;
     }

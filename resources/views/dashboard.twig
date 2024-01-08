@@ -68,7 +68,8 @@
                         <tr>
                             <td>{{ transaction.description[0:20] }}</td>
                             <td class="{{ transaction.amount > 0 ? 'text-success fw-bold' : '' }}">
-                                {{ transaction.amount < 0 ? '-' : '' }}${{ transaction.amount | abs | number_format(2, '.', ',') }}
+                                {{ transaction.amount < 0 ? '-' : '' }}
+                                ${{ transaction.amount | abs | number_format(2, '.', ',') }}
                             </td>
                             <td>
                                 <div>{{ transaction.categoryName | capitalize ?: 'N/A' }}</div>
@@ -86,7 +87,7 @@
                     <div class="category-card p-4 text-center d-flex align-items-center justify-content-center">
                         <div>
                             <h6 class="fs-6 fw-normal">{{ spendingCategory.name }}</h6>
-                            <h1 class="fs-1 text-danger text-opacity-75">${{ spendingCategory.amount|abs }}</h1>
+                            <h1 class="fs-1 text-danger text-opacity-75">${{ spendingCategory.amount | abs | number_format(2, '.', ',') }}</h1>
                         </div>
                     </div>
                 </div>

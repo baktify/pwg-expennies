@@ -12,7 +12,6 @@ use App\RequestValidators\TransactionUpdateRequestValidator;
 use App\RequestValidators\UploadTransactionFromCsvRequestValidator;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
-use App\Services\CsvFileService;
 use App\Services\RequestService;
 use App\Services\TransactionImportService;
 use App\Services\TransactionService;
@@ -31,9 +30,7 @@ class TransactionController
         private readonly ResponseFormatter                $responseFormatter,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly CategoryService                  $categoryService,
-        private readonly CsvFileService                   $csvParserService,
         private readonly EntityManagerServiceInterface    $entityManager,
-        private readonly CacheInterface                   $cache,
     )
     {
     }
@@ -136,9 +133,9 @@ class TransactionController
         $csvFile = reset($data);
         $csvPath = $csvFile->getStream()->getMetadata('uri');
 
-        $parsedTransactionRecords = $this->csvParserService->parseTransactionFile($csvPath);
+//        $parsedTransactionRecords = $this->csvParserService->parseTransactionFile($csvPath);
 
-        $this->transactionImportService->import($parsedTransactionRecords);
+        $this->transactionImportService->import($csvPath);
 
         return $this->responseFormatter->asJson($response, [
             'message' => 'Success',

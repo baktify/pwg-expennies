@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\ResponseFormatter;
+use App\Services\CacheService;
 use App\Services\CategoryService;
 use App\Services\TransactionService;
 use Clockwork\Clockwork;
 use Clockwork\Request\LogLevel;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\SimpleCache\CacheInterface;
 use Slim\Views\Twig;
 
 class HomeController
@@ -20,19 +22,25 @@ class HomeController
         private readonly TransactionService $transactionService,
         private readonly CategoryService    $categoryService,
         private readonly ResponseFormatter  $responseFormatter,
-        private readonly Clockwork          $clockwork,
+        private readonly CacheService       $cacheService,
     )
     {
     }
 
     public function index(Response $response): Response
     {
-        $startDate = \DateTime::createFromFormat('Y-m-d', date('2023-01-01'));
-        $endDate = \DateTime::createFromFormat('Y-m-d', date('2023-12-31'));
-        $totals = $this->transactionService->getTotals($startDate, $endDate);
-        $recentTransactions = $this->transactionService->getRecentTransactions(10);
+        $startDate = \DateTime::createFromFormat('Y-m-d', date('2023-12-01'));
+        $endDate = new \DateTime('now');
 
-        $topSpendingCategories = $this->categoryService->getTopSpendingCategories(4);
+        $totals = $this->cacheService->getOrSet(
+            'totals', fn() => $this->transactionService->getTotals($startDate, $endDate)
+        );
+        $recentTransactions = $this->cacheService->getOrSet(
+            'recentTransactions', fn() => $this->transactionService->getRecentTransactions(10)
+        );
+        $topSpendingCategories = $this->cacheService->getOrSet(
+            'topSpendingCategories', fn() => $this->categoryService->getTopSpendingCategories(4)
+        );
 
         return $this->twig->render($response, 'dashboard.twig', [
             'totals' => $totals,
@@ -45,7 +53,10 @@ class HomeController
     {
         $year = 2023;
 //        $year = (int)$request->getParsedBody()['year'] ?: (int)date('Y');
-        $data = $this->transactionService->getMonthlySummary($year);
+
+        $data = $this->cacheService->getOrSet(
+            'monthlySummary', fn() => $this->transactionService->getMonthlySummary($year)
+        );
 
         return $this->responseFormatter->asJson($response, $data);
     }
