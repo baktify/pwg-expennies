@@ -18,6 +18,7 @@ use App\Services\TransactionImportService;
 use App\Services\TransactionService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\SimpleCache\CacheInterface;
 use Slim\Views\Twig;
 
 class TransactionController
@@ -32,6 +33,7 @@ class TransactionController
         private readonly CategoryService                  $categoryService,
         private readonly CsvFileService                   $csvParserService,
         private readonly EntityManagerServiceInterface    $entityManager,
+        private readonly CacheInterface                   $cache,
     )
     {
     }
@@ -47,11 +49,10 @@ class TransactionController
 
         $transactions = $this->transactionService->getPaginatedTransactions($params);
         $totalTransactions = count($transactions);
-        $mapper = $this->transactionService->getDataTableMapper();
 
         return $this->responseFormatter->asDataTable(
             $response,
-            array_map($mapper, (array)$transactions->getIterator()),
+            array_map($this->transactionService->getDataTableMapper(), (array)$transactions->getIterator()),
             $params->draw,
             $totalTransactions
         );

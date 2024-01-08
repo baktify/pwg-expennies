@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\SimpleCache\CacheInterface;
 
 class TestController
 {
@@ -35,13 +36,14 @@ class TestController
         private readonly AuthInterface                 $auth,
         private readonly UserService                   $userService,
         private readonly UserLoginCodeService          $userLoginCodeService,
+        private readonly CacheInterface                $cache,
     )
     {
     }
 
     public function test(Request $request, Response $response): Response
     {
-        echo abs(-25.25);
+        $this->cache->clear();
 
         return $response;
     }

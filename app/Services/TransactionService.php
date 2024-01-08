@@ -11,12 +11,18 @@ use App\Entities\Category;
 use App\Entities\Receipt;
 use App\Entities\Transaction;
 use App\Entities\User;
+use Clockwork\Clockwork;
+use Clockwork\Request\LogLevel;
 use DateTime;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Psr\SimpleCache\CacheInterface;
 
 class TransactionService
 {
-    public function __construct(private readonly EntityManagerServiceInterface $entityManager)
+    public function __construct(
+        private readonly EntityManagerServiceInterface $entityManager,
+        private readonly Clockwork                     $clockwork,
+    )
     {
     }
 
@@ -140,15 +146,16 @@ class TransactionService
 
     public function getTotals(\DateTime $startDate, \DateTime $endDate): array
     {
-        $x = $this->entityManager->getRepository(Transaction::class)->createQueryBuilder('t')
+        $transactionsAmount = $this->entityManager->createQueryBuilder()
             ->select('t.amount')
+            ->from(Transaction::class, 't')
             ->getQuery()
             ->getResult();
 
-        $transactionAmounts = array_map(fn($item) => $item['amount'], $x);
+        $transactionsAmount = array_map(fn($item) => $item['amount'], $transactionsAmount);
 
         $totals = ['income' => 0, 'expense' => 0, 'net' => 0];
-        foreach ($transactionAmounts as $amount) {
+        foreach ($transactionsAmount as $amount) {
             if ($amount < 0) {
                 $totals['expense'] += $amount;
             } else {
@@ -166,9 +173,9 @@ class TransactionService
             ->select('t.description', 't.amount', 't.date', 'c.name as categoryName')
             ->from(Transaction::class, 't')
             ->leftJoin('t.category', 'c')
+            ->orderBy('t.date', 'DESC')
             ->setFirstResult(0)
             ->setMaxResults($limit)
-            ->orderBy('t.date', 'DESC')
             ->getQuery()->getResult();
     }
 
@@ -197,7 +204,7 @@ class TransactionService
         $totals = ['income' => 0, 'expense' => 0];
 
         foreach ($transactions as $transaction) {
-            $amount = (float) $transaction['amount'];
+            $amount = (float)$transaction['amount'];
 
             if ($amount < 0) {
                 $totals['expense'] += abs($amount);

@@ -107,7 +107,7 @@ class CategoryService
             ->join('c.transactions', 't')
             ->getQuery()
             ->getResult();
-        dd($categories);
+
         // Foreach category in categories -> calculate transactions expense
         $categoriesResult = [];
         for ($i = 0; $i < count($categories); $i++) {
