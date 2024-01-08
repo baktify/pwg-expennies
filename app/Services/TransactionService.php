@@ -149,6 +149,11 @@ class TransactionService
         $transactionsAmount = $this->entityManager->createQueryBuilder()
             ->select('t.amount')
             ->from(Transaction::class, 't')
+            ->where('t.date BETWEEN :startDate AND :endDate')
+            ->setParameters([
+                ':startDate' => $startDate,
+                ':endDate' => $endDate,
+            ])
             ->getQuery()
             ->getResult();
 

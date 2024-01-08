@@ -100,32 +100,15 @@ class CategoryService
 
     public function getTopSpendingCategories(int $limit): array
     {
-        // Get all categories with transactions
-        $categories = $this->entityManager->createQueryBuilder()
-            ->select('c', 't')
+        return $this->entityManager->createQueryBuilder()
+            ->select('c.name, SUM(t.amount) as amount')
             ->from(Category::class, 'c')
             ->join('c.transactions', 't')
+            ->where('t.amount < 0')
+            ->orderBy('amount', 'DESC')
+            ->groupBy('c.id')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
-
-        // Foreach category in categories -> calculate transactions expense
-        $categoriesResult = [];
-        for ($i = 0; $i < count($categories); $i++) {
-
-            /** @var Category $category */
-            $category = $categories[$i];
-            $categoriesResult[$i]['name'] = $category->getName();
-            $categoriesResult[$i]['amount'] = 0;
-
-            /** @var Transaction $transaction */
-            foreach ($category->getTransactions() as $transaction) {
-                $categoriesResult[$i]['amount'] += $transaction->getAmount();
-            }
-        }
-
-        // Sort categories
-        uasort($categoriesResult, fn ($a, $b) => $a['amount'] <=> $b['amount']);
-
-        return array_slice($categoriesResult, 0, $limit);
     }
 }

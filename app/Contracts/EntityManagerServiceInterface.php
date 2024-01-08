@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 interface EntityManagerServiceInterface
 {
-    public function sync($entity = null): void;
+    public function sync($entity = null, bool $flush = true): void;
 
     public function delete($entity, bool $sync = false): void;
 

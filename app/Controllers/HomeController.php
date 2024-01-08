@@ -27,8 +27,8 @@ class HomeController
 
     public function index(Response $response): Response
     {
-        $startDate = \DateTime::createFromFormat('Y-m-d', date('Y-01-01'));
-        $endDate = new \DateTime('now');
+        $startDate = \DateTime::createFromFormat('Y-m-d', date('2023-01-01'));
+        $endDate = \DateTime::createFromFormat('Y-m-d', date('2023-12-31'));
         $totals = $this->transactionService->getTotals($startDate, $endDate);
         $recentTransactions = $this->transactionService->getRecentTransactions(10);
 
@@ -43,7 +43,8 @@ class HomeController
 
     public function getYearToDateStatistics(Request $request, Response $response): Response
     {
-        $year = (int)$request->getParsedBody()['year'] ?: (int)date('Y');
+        $year = 2023;
+//        $year = (int)$request->getParsedBody()['year'] ?: (int)date('Y');
         $data = $this->transactionService->getMonthlySummary($year);
 
         return $this->responseFormatter->asJson($response, $data);

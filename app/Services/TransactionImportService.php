@@ -32,7 +32,7 @@ class TransactionImportService
                 $queuedCategories = [];
 
                 $count = 1;
-                $batch = 250;
+                $batch = 500;
 
                 /** @var CsvTransactionData $record */
                 foreach ($records as $record) {
