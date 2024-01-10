@@ -24,6 +24,7 @@ use League\Flysystem\Filesystem;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\SimpleCache\CacheInterface;
+use Slim\Views\Twig;
 
 class TestController
 {
@@ -38,15 +39,17 @@ class TestController
         private readonly UserService                   $userService,
         private readonly UserLoginCodeService          $userLoginCodeService,
         private readonly CacheInterface                $cache,
+        private readonly Twig                          $twig,
     )
     {
     }
 
     public function test(Request $request, Response $response): Response
     {
-        $user =$this->userService->createUser(new UserRegisterData('X', 'heyo@mail.ru', '123'));
-        dd($user);
+        $this->cache->clear();
 
-        return $response;
+        dd(123);
+
+//        return $this->twig->render($response, 'test.twig');
     }
 }

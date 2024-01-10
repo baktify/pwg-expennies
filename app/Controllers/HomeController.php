@@ -51,7 +51,7 @@ class HomeController
 
     public function getYearToDateStatistics(Response $response): Response
     {
-        $year = (int) date('Y');
+        $year = (int)date('Y');
 
         $data = $this->cacheService->getOrSet(
             'monthlySummary', fn() => $this->transactionService->getMonthlySummary($year)

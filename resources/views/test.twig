@@ -1,0 +1,12 @@
+{% extends 'auth/layout.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('test') }}
+{% endblock %}
+
+{% block title %}Test with js{% endblock %}
+
+{% block content %}
+    Testing ...
+{% endblock %}

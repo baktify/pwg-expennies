@@ -25,7 +25,7 @@ export const updatePassword = async (endpoint, formData, parentDom) => {
     try {
         clearErrors(parentDom)
 
-        const {status} = await axe.post(endpoint, {
+        const {status} = await axe.put(endpoint, {
             ...formData,
             ...getCsrfFields()
         })
