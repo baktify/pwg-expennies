@@ -46,10 +46,10 @@ class TestController
 
     public function test(Request $request, Response $response): Response
     {
-        $this->cache->clear();
+//        $this->cache->clear();
+//
+//        dd(123);
 
-        dd(123);
-
-//        return $this->twig->render($response, 'test.twig');
+        return $this->twig->render($response, 'test.twig');
     }
 }

@@ -39,7 +39,8 @@ return function (App $app) {
             ->setName('forgotPassword')->add(RateLimitMiddleware::class);
         $guest->get('/reset-password/{token}', [PasswordResetController::class, 'showResetPasswordForm'])
             ->setName('reset-password')->add(ValidateSignatureMiddleware::class);
-        $guest->post('/reset-password/{token}', [PasswordResetController::class, 'handleResetPasswordRequest']);
+        $guest->put('/reset-password/{token}', [PasswordResetController::class, 'handleResetPasswordRequest'])
+            ->add(ValidateSignatureMiddleware::class);
     })->add(GuestMiddleware::class);
 
     $app->group('', function (RouteCollectorProxy $group) {

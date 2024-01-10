@@ -5,7 +5,7 @@ const init = () => {
 }
 
 const test = async () => {
-    const response = await axios.post(`http://localhost:8000/reset-password/b9c559f9a345f79aeab44376cbf6994d638e41abe0b0ac357a1e5ffcf37ef7e3`, {
+    const response = await axios.put(`http://localhost:8000/reset-password/b735d1bb2c44a39a948ad94c7c94c97ca279ed342ea4f41be7684b32dd9c9549?expiration=1704921000&signature=65e623c5b1450774292372d8af4abeafbc74b5ea69d7fbda390dc3dd093c3238`, {
         ...getCsrfFields(),
         password: 'qqq',
         confirmPassword: 'qqq',

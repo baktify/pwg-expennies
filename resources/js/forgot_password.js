@@ -26,10 +26,11 @@ const init = () => {
 
     if (resetPasswordBtn) {
         const onClickResetPasswordBtn = () => {
+            const endpoint = window.location.toString()
             const form = resetPasswordBtn.closest('form')
             const formData = Object.fromEntries(new FormData(form));
 
-            updatePassword(form.action, formData, form).then(({status}) => {
+            updatePassword(endpoint, formData, form).then(({status}) => {
                 if (status) {
                     alert('You password has been updated. You will be redirected to login page')
 

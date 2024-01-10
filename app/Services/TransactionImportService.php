@@ -42,7 +42,7 @@ class TransactionImportService
 
                 foreach ($records as $record) {
                     /** @var CsvTransactionData $record */
-                    $record = $this->formatCsvRecord($record);
+                    $record = $this->getCsvRecordData($record);
 
                     $categoryFromCsv = strtolower($record->category);
 
@@ -87,7 +87,7 @@ class TransactionImportService
         }
     }
 
-    private function formatCsvRecord($record): CsvTransactionData
+    private function getCsvRecordData($record): CsvTransactionData
     {
         $record = array_change_key_case($record);
         [

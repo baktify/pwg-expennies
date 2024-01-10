@@ -73,6 +73,14 @@ class PasswordResetController
 
     public function handleResetPasswordRequest(Request $request, Response $response, array $args): Response
     {
+        $token = $args['token'];
+
+        // Verify if passwordReset token is active
+        if (!$this->passwordResetService->verify($token)) {
+            $response->getBody()->write('Token has expired');
+            return $response;
+        }
+
         $data = $this->requestValidatorFactory->make(PasswordResetRequestValidator::class)->validate(
             $request->getParsedBody()
         );
