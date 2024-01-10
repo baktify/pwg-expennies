@@ -44,8 +44,7 @@ class TestController
     public function test(Request $request, Response $response): Response
     {
         dd(
-            (new \DateTime())->format('Y'),
-            date('YasYdm-07-asd24asd')
+            (new \DateTime())
         );
         $this->cache->clear();
 

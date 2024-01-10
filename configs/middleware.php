@@ -7,7 +7,6 @@ use App\Enums\AppEnvironment;
 use App\Middlewares\ActiveNavLinkMiddleware;
 use App\Middlewares\CsrfFieldsMiddleware;
 use App\Middlewares\InvalidLinkMiddleware;
-use App\Middlewares\RedirectFromVerifyRouteIfUserVerifiedMiddleware;
 use App\Middlewares\SessionStartMiddleware;
 use App\Middlewares\TestMiddleware;
 use App\Middlewares\TwigValidationErrorsMiddleware;
@@ -47,7 +46,6 @@ return function (App $app) {
 
     $app->addRoutingMiddleware();
 
-
     $app->add(SessionStartMiddleware::class);
 
     if (AppEnvironment::isDevelopment($config->get('app_environment'))) {
@@ -55,5 +53,4 @@ return function (App $app) {
     }
 
     $app->add(new Zeuxisoo\Whoops\Slim\WhoopsMiddleware());
-
 };
