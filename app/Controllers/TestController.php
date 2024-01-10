@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Config;
 use App\Contracts\AuthInterface;
 use App\Contracts\EntityManagerServiceInterface;
+use App\DataObjects\UserRegisterData;
 use App\Entities\Category;
 use App\Entities\Receipt;
 use App\Entities\Transaction;
@@ -43,10 +44,8 @@ class TestController
 
     public function test(Request $request, Response $response): Response
     {
-        dd(
-            (new \DateTime())
-        );
-        $this->cache->clear();
+        $user =$this->userService->createUser(new UserRegisterData('X', 'heyo@mail.ru', '123'));
+        dd($user);
 
         return $response;
     }

@@ -126,7 +126,6 @@ class Auth implements AuthInterface
             throw new ValidationException(['code' => ['Invalid code']]);
         }
 
-        $this->session->forget('2FA');
         $status = $this->authenticate($user);
 
         if ($status === AuthAttemptStatus::SUCCESS) {
